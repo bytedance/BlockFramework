@@ -1,0 +1,88 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-android-extensions'
+    id 'maven-publish'
+}
+
+android {
+    compileSdkVersion 30
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 30
+    }
+
+    buildTypes {
+
+    }
+
+    lintOptions {
+        // Turns off checks for the issue IDs you specify.
+        disable 'GradleCompatible', 'RequiredSize'// 暂时禁用RequiredSize，有bug https://issuetracker.google.com/issues/37138580
+
+        // Turns on checks for the issue IDs you specify. These checks are in
+        // addition to the default lint checks.
+        // enable 'RtlHardcoded','RtlCompat', 'RtlEnabled'
+
+        // To enable checks for only a subset of issue IDs and ignore all others,
+        // list the issue IDs with the 'check' property instead. This property overrides
+        // any issue IDs you enable or disable using the properties above.
+        // check 'NewApi', 'InlinedApi'
+
+        // If set to true, turns off analysis progress reporting by lint.
+        quiet true
+
+        // if set to true (default), stops the build if errors are found.
+        abortOnError false
+
+        // if true, only report errors.
+        ignoreWarnings true
+
+        // no check
+        checkReleaseBuilds false
+
+        // if true, don't include source code lines in the error output
+        noLines false
+
+        // if true, show all locations for an error, do not truncate lists, etc.
+        showAll true
+
+        // if true, generate a text report of issues (false by default)
+        textReport true
+
+        // location to write the output; can be a file or 'stdout'
+        textOutput 'stdout'
+
+        // if true, generate an HTML report for use by for example Jenkins
+        // htmlReport true
+        // file to write report to (if not specified, defaults to lint-results.html)
+        // htmlOutput file("lint-results.html")
+
+        xmlReport true
+        xmlOutput file("lint-results.xml")
+    }
+}
+
+dependencies {
+//    api getLib('FRAMEWORK_UTILITY')
+//    api getLib('LIFECYCLE_EXTENSIONS')
+//    api getLib('COMMON_MONITOR')
+//    api getLib('LIFECYCLE_COMMON')
+
+    implementation LIFECYCLE_EXTENSIONS
+    implementation LIFECYCLE_COMMON
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId 'com.github.bytedance'
+                artifactId 'block-framework'
+                version = '0.1.0'
+            }
+        }
+    }
+}
+

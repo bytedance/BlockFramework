@@ -1,0 +1,10 @@
+[
+  {
+    "attachName": "blockframework",
+    "name": "blockframework",
+    "path": "blockframework",
+    "components": [
+      "blockframework"
+    ]
+  }
+]

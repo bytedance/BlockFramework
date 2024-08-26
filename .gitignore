@@ -1,0 +1,42 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Eclipse
+.classpath
+.project
+.settings
+eclipsebin
+
+# IntelliJ IDEA
+.idea
+*.ipl
+*.iws
+classes/
+idea-classes/
+coverage-error.log
+
+# Android
+gen
+bin
+project.properties
+out
+captures
+
+lint-results.xml
+
+.githookconfig
+config_local.gradle
+__xg_localbuild_script.gradle
