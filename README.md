@@ -18,7 +18,7 @@ BlockFramework是一套具备解耦、分层、组装和协同能力的客户端
 | 西瓜视频 | 
 
 ## 快速接入
-
+添加仓库源：
 ```gradle
 allprojects {
 	repositories {
