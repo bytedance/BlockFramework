@@ -51,7 +51,7 @@ class DemoHolder(itemView: View) : RecyclerView.ViewHolder(itemView), IBlockJoin
 }
 ```
 2. Create the corresponding business Block according to different logical businesses, which can inherit from `UIBlock` or `BaseBlock` respectively according to whether it is a UI scene
-- 1. 3. `UIBlock` needs to implement `layoutResource()` to return the layout XML corresponding to the Block
+- 1. `UIBlock` needs to implement `layoutResource()` to return the layout XML corresponding to the Block
 ```kotlin
 class BottomInfoBlock(blockContext: IBlockContext): UIBlock<DemoCardData, DemoModel>(blockContext) {
 
