@@ -18,7 +18,6 @@ package com.bytedance.blockframework.framework.join
 import android.content.Context
 import android.view.View
 import androidx.lifecycle.Lifecycle
-import com.bytedance.blockframework.framework.async.ICustomTaskScheduler
 import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.config.BlockInit
 import com.bytedance.blockframework.framework.core.BlockCoreManager
@@ -32,19 +31,14 @@ import com.bytedance.blockframework.interaction.Event
 import com.bytedance.blockframework.interaction.IBlockMessageCenter
 
 /**
- * Block框架上下文，建立Block框架内外联系
+ * Block framework context, establishing internal and external connections within the Block framework
  *
  * @author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
 interface IBlockContext {
-
     fun getScene(): IBlockScene
-
-    /**
-     * 自定义messageCenter, 需在initRootBlock()之前调用
-     */
     fun setMessageCenter(center: IBlockMessageCenter)
     fun getMessageCenter(): IBlockMessageCenter
     fun findBlockSupervisor(block: BaseBlock<*,*>): BlockSupervisor
@@ -56,17 +50,13 @@ interface IBlockContext {
     fun <T> getBlockService(clazz: Class<T>) : T?
     fun notifyEvent(event: Event)
     fun addAfterBindTask(action: ()->Unit)
-    fun setCustomTaskScheduler(scheduler: ICustomTaskScheduler?)
-    fun getCustomTaskScheduler(): ICustomTaskScheduler?
 }
 
-class BlockContextImpl(val blockScene: IBlockScene) : IBlockContext {
+class BlockContextImpl(private val blockScene: IBlockScene) : IBlockContext {
+
     private val blockCore = BlockCoreManager()
     private var inflater: BlockInflater? = null
-
     private val dependMap : MutableMap<Class<*>, IBlockDepend> = mutableMapOf()
-
-    private var customBlockTaskScheduler: ICustomTaskScheduler? = null
 
     internal fun initRootBlock(context: Context, rootBlock: BaseBlock<*,*>, messageCenter: IBlockMessageCenter, parent: View? = null) {
         blockCore.initScene(blockScene)
@@ -137,14 +127,4 @@ class BlockContextImpl(val blockScene: IBlockScene) : IBlockContext {
     override fun addAfterBindTask(action: ()->Unit) {
         return blockCore.addAfterBindTask(action)
     }
-
-    override fun setCustomTaskScheduler(scheduler: ICustomTaskScheduler?) {
-        customBlockTaskScheduler = scheduler
-    }
-
-    override fun getCustomTaskScheduler(): ICustomTaskScheduler? {
-       return customBlockTaskScheduler
-    }
-
-
 }

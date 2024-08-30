@@ -16,7 +16,6 @@
 package com.bytedance.blockframework.framework.core
 
 /**
- * @Description: Block数据模型
  *
  * @Author: Created by zhoujunjie on 2023/8/25
  * @mail zhoujunjie.9743@bytedance.com

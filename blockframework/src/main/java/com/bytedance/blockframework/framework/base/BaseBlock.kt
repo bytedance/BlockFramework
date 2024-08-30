@@ -24,7 +24,6 @@ import com.bytedance.blockframework.framework.join.IBlockContext
 import com.bytedance.blockframework.framework.utils.findSupervisor
 
 /**
- * Description: Block 基类
  *
  * @Author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com
@@ -34,57 +33,43 @@ open class BaseBlock<DATA, MODEL : IBlockModel<DATA>>(var blockContext: IBlockCo
 
     private val blockName by lazy { this::class.java.simpleName + "_" + this.hashCode() }
 
-    // 当前Block的parent
-    var parent: BlockSupervisor? = null
-
-    // 是否立即Bind
+    internal var parent: BlockSupervisor? = null
     internal var immediateBind = false
 
-    // 是否懒加载
     open var lazyActive = false
-
     open var isBlockActivated = true
     open var activeTask: (() -> Unit)? = null
+
     open fun activeIfNeed() {
         if (!isActive()) {
             activeTask?.invoke()
         }
     }
 
-    // 用于组装子Block
-    open fun assembleSubBlocks(assembler: BlockAssembler) {}
+    open fun getBlockKey(): String = blockName
 
-    //<editor-fold desc="Block生命周期">
-    /**
-     * onPrepared() 更改为 onRegister()
-     */
-    @Deprecated(message = "请使用onRegister()", replaceWith = ReplaceWith("onRegister"))
+    //<editor-fold desc="Block Lifecycle">
+    @Deprecated(message = "please use onRegister()", replaceWith = ReplaceWith("onRegister()"))
     override fun onPrepared() {
         onRegister()
     }
-
     open fun onRegister() {}
-
     override fun onCreate() {}
     override fun onStart() {}
     override fun onResume() {}
     override fun onPause() {}
     override fun onStop() {}
     override fun onDestroy() {}
-
     override fun onUnRegister() {}
     //</editor-fold>
-
 
     override fun defineBlockService(): Class<*>? = null
     override fun isActive(): Boolean = isBlockActivated
 
-    // 数据Bind
     open fun bindModel(model: MODEL?) {}
 
-    /**
-     * 从父Block里取查找对应的Service
-     */
+    open fun assembleSubBlocks(assembler: BlockAssembler) {}
+
     override fun <T> getBlockService(klass: Class<T>, activeIfNeed: Boolean): T? {
         if (blockBlockMessageCenter is TreeBlockMessageCenter) {
             var supervisor = findSupervisor()
@@ -98,5 +83,4 @@ open class BaseBlock<DATA, MODEL : IBlockModel<DATA>>(var blockContext: IBlockCo
         return blockBlockMessageCenter.queryService(this, klass, activeIfNeed)
     }
 
-    open fun getBlockKey(): String = blockName
 }

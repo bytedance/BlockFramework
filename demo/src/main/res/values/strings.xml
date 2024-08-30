@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BlockDemo</string>
+
+    <string name="praise_text_name">Praise</string>
+    <string name="comment_text_name">Comment</string>
+    <string name="collect_text_name">Collect</string>
+
+</resources>

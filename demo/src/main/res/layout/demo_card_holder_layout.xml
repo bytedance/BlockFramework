@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:splitMotionEvents="false"
+    tools:ignore="ResourceName">
+
+    <FrameLayout
+        android:id="@+id/main_content_block_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/bottom_info_block_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="36dp"
+        android:gravity="left"
+        android:orientation="vertical"
+        tools:background="@color/assist_1"
+        tools:layout_height="100dp"
+        tools:layout_width="200dp" />
+
+    <LinearLayout
+        android:id="@+id/right_interact_block_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="36dp"
+        android:layout_marginEnd="12dp"
+        android:orientation="vertical"
+        tools:background="@color/assist_2"
+        tools:layout_height="250dp"
+        tools:layout_width="60dp" />
+
+    <FrameLayout
+        android:id="@+id/radical_feed_card_extension_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        tools:background="@color/assist_3"
+        tools:layout_height="30dp"
+        tools:layout_width="match_parent" />
+
+</FrameLayout>

@@ -16,7 +16,6 @@
 package com.bytedance.blockframework.framework.join
 
 /**
- * 场景定义
  *
  * @Author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com

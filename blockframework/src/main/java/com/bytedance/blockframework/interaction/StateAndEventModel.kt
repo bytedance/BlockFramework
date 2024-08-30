@@ -28,7 +28,7 @@ abstract class StateAndEventModel {
 
     abstract fun onUnRegister()
 
-    //<editor-fold desc="共享状态">
+    //<editor-fold desc="Share State">
     val providers: MutableList<IStatusProvider<out State>> = mutableListOf()
     fun <T : State> shareState(provider: IStatusProvider<in T>) {
         if (providers.contains(provider)) {
@@ -42,7 +42,7 @@ abstract class StateAndEventModel {
     }
     //</editor-fold>
 
-    //<editor-fold desc="驱动事件">
+    //<editor-fold desc="Drive Event">
     val observers: MutableList<IObserver<Event>> = mutableListOf()
     open fun subscribe(observer: IObserver<Event>, eventClass: Class<out Event>) {
         if (!observers.contains(observer)) {

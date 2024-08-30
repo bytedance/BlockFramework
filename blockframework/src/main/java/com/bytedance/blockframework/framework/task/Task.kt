@@ -16,7 +16,6 @@
 package com.bytedance.blockframework.framework.task
 
 /**
- * @Description:
  *
  * @Author: Created by zhoujunjie on 2023/7/18
  * @mail zhoujunjie.9743@bytedance.com

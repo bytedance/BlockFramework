@@ -21,7 +21,7 @@ import com.bytedance.blockframework.framework.monitor.BlockLogger
 import com.bytedance.blockframework.framework.utils.findSupervisor
 
 /**
- * 限制event流向的EventManager
+ * EventManager that restricts event flow
  */
 open class TreeConstrainEventManager:  EventManager() {
 

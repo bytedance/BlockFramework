@@ -32,10 +32,6 @@ abstract class AbstractBlock: StateAndEventModel(), IObserver<Event> {
     private val TAG = this.javaClass.simpleName
     private val DEBUG = BlockLogger.debug()
 
-    /**
-     * 1. block在context在registerBlock()时赋值，因而在Block的初始化中无法使用
-     * 2. block内的初始化操作如需使用context，可以在onPrepared()方法中进行初始化，可参考简介Tab {@link BriefTabBlock}, 评论Tab {@link DetailCommentBlock}
-     */
     open lateinit var context: Context
 
     abstract fun defineBlockService(): Class<*>?

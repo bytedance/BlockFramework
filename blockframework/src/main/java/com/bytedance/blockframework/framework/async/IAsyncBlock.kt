@@ -19,68 +19,21 @@ import androidx.annotation.MainThread
 
 
 /**
- * @Description:
- *
  * @Author: Created by zhoujunjie on 2023/3/7
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
-/**
- * 切换到主线程
- */
 typealias SyncInvoke = (() -> Unit) -> Unit
 
-
-
 interface IAsyncBind<MODEL> {
-    /**
-     * 表示Block是否支持asyncBind，子Block必须实现
-     */
+
     fun enableAsyncBind(): Boolean
 
-    /**
-     * 同步Bind，主线程执行
-     */
     @MainThread
     fun syncBind(model: MODEL?)
 
     /**
-     * 异步Bind，根据[enableAsyncBind()]判断是否在子线程执行
-     * @param syncInvoke: 用于切换到主线程
+     * @param syncInvoke: Used to switch to the main thread
      */
     fun asyncBind(model: MODEL?, syncInvoke: SyncInvoke)
-}
-
-/**
- * 可以由外界设置的任务调度器
- */
-interface ICustomTaskScheduler {
-    /**
-     * asyncBind的时候把消息抛回主线程
-     */
-    fun asyncBindChangeToMain(caller: Any?, task: (() -> Unit))
-
-    /**
-     * 提交一个任务到主线程，该任务跟别的类似的任务会被打散执行
-     * @param onlyForHiddenWhenBindCard 是否只有在卡片bind的时候不可见才post执行
-     *                                  如果传入true，并且卡片在bind的时候是可见的，那么任务会被直接执行
-     */
-    fun summitBreakUpMainTask(onlyForHiddenWhenBindCard: Boolean, simpleLogInfo: String?, task: Runnable)
-
-    /**
-     * 提交延迟任务到主线程，任务会在闲时执行
-     */
-    fun summitDelayMainTask(simpleLogInfo: String?, task: Runnable)
-
-    /**
-     * 提交一个延迟任务到子线程，任务会在闲时执行
-     */
-    fun summitDelayWorkerThreadTask(simpleLogInfo: String?, task: Runnable)
-
-    /**
-     * 卡片在bind的时候是否不可见
-     */
-    fun isHiddenWhenBind(): Boolean
-
-    fun getOriginScheduler(): Any?
 }

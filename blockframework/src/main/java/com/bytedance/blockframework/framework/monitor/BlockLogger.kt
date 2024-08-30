@@ -19,13 +19,13 @@ import android.os.SystemClock
 import android.util.Log
 
 /**
- * @Description:
  *
  * @Author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
 interface BlockLogger {
+
     fun debug(): Boolean
 
     fun log(tag: String, info: String)

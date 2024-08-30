@@ -27,9 +27,6 @@ import com.bytedance.blockframework.interaction.BaseBlockMessageCenter
 
 open class TreeBlockMessageCenter : BaseBlockMessageCenter() {
 
-    /**
-     * 每次注册service时，将对应的service绑定到当前Block的父Block的SuperVisor中
-     */
     override fun <T> registerService(klass: Class<T>, blockImplWrapper: BlockImplWrapper) {
         var block = blockImplWrapper.impl as? BaseBlock<*,*>
         while (block != null) {

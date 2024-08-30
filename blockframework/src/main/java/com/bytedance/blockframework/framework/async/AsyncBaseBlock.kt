@@ -25,13 +25,13 @@ import com.bytedance.blockframework.framework.monitor.currentTime
 import com.bytedance.blockframework.framework.performance.Executor
 
 /**
- * Description: 支持异步Bind的Block
  *
  * @Author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
-abstract class AsyncBaseBlock<DATA, MODEL : IBlockModel<DATA>>(blockContext: IBlockContext) : BaseBlock<DATA, MODEL>(blockContext), IAsyncBind<MODEL> {
+abstract class AsyncBaseBlock<DATA, MODEL : IBlockModel<DATA>>(blockContext: IBlockContext) :
+    BaseBlock<DATA, MODEL>(blockContext), IAsyncBind<MODEL> {
 
     override fun bindModel(model: MODEL?) {
         if (enableAsyncBind()) {
@@ -40,12 +40,7 @@ abstract class AsyncBaseBlock<DATA, MODEL : IBlockModel<DATA>>(blockContext: IBl
             kotlin.runCatching {
                 syncBind(model)
             }.onFailure {
-                val params = hashMapOf(
-                    "block_key" to getBlockKey(),
-                    "enable_async" to "1",
-                    "msg" to "sync_bind_exception"
-                )
-                BlockInit.uploadExceptionOnline(params, it)
+                BlockInit.recordException(it)
             }
             recordPref(TYPE_BLOCK_BIND, "sync_bind_end", currentTime() - startSync)
             Executor.work().post {
@@ -53,31 +48,16 @@ abstract class AsyncBaseBlock<DATA, MODEL : IBlockModel<DATA>>(blockContext: IBl
                 recordPref(TYPE_BLOCK_BIND, "async_bind_start")
                 kotlin.runCatching {
                     asyncBind(model) {
-                        val customScheduler = blockContext.getCustomTaskScheduler()
-                        if (customScheduler != null) {
-                            customScheduler.asyncBindChangeToMain(this@AsyncBaseBlock, it)
-                        } else {
-                            Executor.main().post {
-                                kotlin.runCatching {
-                                    it.invoke()
-                                }.onFailure { e ->
-                                    val params = hashMapOf(
-                                        "block_key" to getBlockKey(),
-                                        "enable_async" to "1",
-                                        "msg" to "async_sync_bind_exception"
-                                    )
-                                    BlockInit.uploadExceptionOnline(params, e)
-                                }
+                        Executor.main().post {
+                            kotlin.runCatching {
+                                it.invoke()
+                            }.onFailure {
+                                BlockInit.recordException(it)
                             }
                         }
                     }
                 }.onFailure {
-                    val params = hashMapOf(
-                        "block_key" to getBlockKey(),
-                        "enable_async" to "1",
-                        "msg" to "async_bind_exception"
-                    )
-                    BlockInit.uploadExceptionOnline(params, it)
+                    BlockInit.recordException(it)
                 }
                 recordPref(TYPE_BLOCK_BIND, "async_bind_end", currentTime() - startAsync)
             }
@@ -90,28 +70,16 @@ abstract class AsyncBaseBlock<DATA, MODEL : IBlockModel<DATA>>(blockContext: IBl
                     it.invoke()
                 }
             }.onFailure {
-                val params = hashMapOf(
-                    "block_key" to getBlockKey(),
-                    "enable_async" to "0",
-                    "msg" to "sync_bind_exception"
-                )
-                BlockInit.uploadExceptionOnline(params, it)
+                BlockInit.recordException(it)
             }
             recordPref(TYPE_BLOCK_BIND, "sync_bind_end", currentTime() - start)
         }
     }
 
-    /**
-     * 同步Bind
-     */
     override fun syncBind(model: MODEL?) {
 
     }
 
-
-    /**
-     * 异步Bind，根据[enableAsyncBind()]判断是否在子线程执行
-     */
     override fun asyncBind(model: MODEL?, syncInvoke: SyncInvoke) {
 
     }

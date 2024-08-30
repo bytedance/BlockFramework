@@ -19,7 +19,6 @@ import android.os.Handler
 
 
 /**
- * @Description:
  *
  * @Author: Created by zhoujunjie on 2022/12/20
  * @mail zhoujunjie.9743@bytedance.com

@@ -19,7 +19,6 @@ import com.bytedance.blockframework.framework.monitor.BlockLogger
 import com.bytedance.blockframework.framework.monitor.DefaultBlockLogger
 
 /**
- * @Description:
  *
  * @Author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com
@@ -39,9 +38,7 @@ interface IBlockInitConfig {
 
     fun enableDebugDependencyCheck(): Boolean
 
-    fun uploadException(params: Map<String, String>, e: Throwable?)
-
-    fun optTaskManagerEnable(): Boolean
+    fun recordException(e: Throwable?)
 
     class DefaultInitConfig : IBlockInitConfig {
 
@@ -67,14 +64,8 @@ interface IBlockInitConfig {
             return true
         }
 
-        override fun uploadException(params: Map<String, String>, e: Throwable?) {
-            e?.let {
-                com.bytedance.blockframework.framework.utils.uploadException(e, true)
-            }
-        }
+        override fun recordException(e: Throwable?) {
 
-        override fun optTaskManagerEnable(): Boolean {
-            return false
         }
     }
 }

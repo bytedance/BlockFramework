@@ -18,7 +18,7 @@ package com.bytedance.blockframework.framework.base
 import com.bytedance.blockframework.framework.join.IBlockContext
 
 /**
- * Description: 默认不需要Bind数据的Block
+ * Description: Blocks that do not require Bind data
  *
  * @Author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com

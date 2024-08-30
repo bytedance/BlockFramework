@@ -21,7 +21,6 @@ import com.bytedance.blockframework.framework.task.BlockInflater
 import com.bytedance.blockframework.framework.task.DefaultLayoutInflater
 
 /**
- * Block配置
  *
  * @author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com
@@ -30,50 +29,56 @@ import com.bytedance.blockframework.framework.task.DefaultLayoutInflater
 open class BaseBlockBuilder<Block : BaseBlock<*,*>> {
 
     /**
-     * Block对象实例
+     * Block Instance
      */
     lateinit var instance: () -> Block
 
     /**
-     * 表示Block能否添加的条件，一般用于同一个Block被复用到不同场景时判断
-     *  如：condition = { scene == InnerStream }，表示只有内流场景才会添加该Block，其他场景不会添加
+     * Conditions indicating whether a Block can be added, generally used to determine
+     *  when the same Block is reused in different scenarios
+     *
+     * For example：condition = { scene == InnerStream }，means that only the Block
+     *  will be added in InnerStream scenarios, and not in other scenarios
      */
     var condition: () -> Boolean = { true }
 
     /**
-     * UIBlock对应的占位ID，该Block对于的View会添加到父Block中对应的parentId上
+     * The placeholder ID corresponding to UIBlock, and the View to which
+     *  the Block is opposed will be added to the corresponding parentId in the parent Block
      */
     @IdRes var parentId: Int = -1
 
     /**
-     * UIBlock中，View的布局参数LayoutParams
+     * In UIBlock, View is added to the layout parameters of the parent Block
      */
     var layoutParams: ViewGroup.LayoutParams? = null
 
     /**
-     * UIBlock中，View是否替换占坑的parentView，结合[parentId]使用
-     *  replaceParent = true，表示该Block对于的View会直接替换掉父Block中[parentId]对应的View，用于减少布局层级
+     * In UIBlock, whether View replaces the parentView occupying the pit,
+     *  please uses it in conjunction with [parentId].
+     *  This is mainly used to reduce layout levels.
      */
     var replaceParent = false
 
     /**
-     * UIBlock自定义布局inflate，默认使用[DefaultLayoutInflater]，可自定义实现
+     * UIBlock custom layout inflate, using [DefaultLayoutInflater] by default
      */
     var viewInflater: BlockInflater? = null
 
     /**
-     * UIBlock创建View时是否必须在主线程
+     * UIBlock must create a View on the main thread or not
      */
     var createUIOnMainThread = false
 
     /**
-     * Block是否立即Bind，默认false，表示会等到View树创建完成后触发Bind
-     * 需结合[createUIOnMainThread]使用
+     * Whether Block Bind immediately, the default is false,
+     *  which means that Bind will be triggered after the View tree is created.
+     *  please use in conjunction with [createUIOnMainThread]
      */
     var immediateBind = false
 
     /**
-     * Block是否懒加载
+     * Means Block delayed loading
      */
     var lazyActive = false
 

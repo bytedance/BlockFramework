@@ -16,6 +16,7 @@
 package com.bytedance.blockframework.framework.task
 
 import androidx.annotation.MainThread
+import androidx.annotation.WorkerThread
 import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.config.BlockInit
 import com.bytedance.blockframework.framework.join.IBlockScene
@@ -28,14 +29,6 @@ import com.bytedance.blockframework.framework.performance.Executor
 import com.bytedance.blockframework.framework.performance.ExecutorHandler
 import com.bytedance.blockframework.framework.utils.uploadException
 import java.util.PriorityQueue
-import java.util.concurrent.atomic.AtomicInteger
-
-/**
- * Description: Handle Block Task
- *
- * @Author: Created by zhoujunjie on 2023/7/18
- * @mail zhoujunjie.9743@bytedance.com
- **/
 
 class TaskManager(private val scene: IBlockScene, private val allTaskMustRunOnMain: Boolean): ITaskManager {
 
@@ -46,14 +39,15 @@ class TaskManager(private val scene: IBlockScene, private val allTaskMustRunOnMa
     private var main: ExecutorHandler = ExecutorHandler(Executor.main(), false)
     private var work: ExecutorHandler = ExecutorHandler(Executor.work(), false)
 
-    private val mainThreadTasks = PriorityQueue(1000,
+    private val mainThreadTasks = PriorityQueue(20,
         Comparator<ScheduleTask> { o1, o2 -> o2.taskPriority.compareTo(o1.taskPriority) })
-    private val subThreadTasks = PriorityQueue(1000,
+    private val subThreadTasks = PriorityQueue(20,
         Comparator<ScheduleTask> { o1, o2 -> o2.taskPriority.compareTo(o1.taskPriority) })
 
     private var allFinished: TasksFinished? = null
 
-    private var taskCount: AtomicInteger? = null
+    private var isMainTasksFinish = false
+    private var isSubTasksFinish = false
 
     private var allTasks = listOf<ScheduleTask>()
 
@@ -67,7 +61,8 @@ class TaskManager(private val scene: IBlockScene, private val allTaskMustRunOnMa
                 subThreadTasks.add(it)
             }
         }
-        taskCount = AtomicInteger(tasks.size)
+        isMainTasksFinish = mainThreadTasks.isEmpty()
+        isSubTasksFinish = subThreadTasks.isEmpty()
     }
 
     @MainThread
@@ -75,88 +70,77 @@ class TaskManager(private val scene: IBlockScene, private val allTaskMustRunOnMa
         this.allFinished = allFinished
         val start = currentTime()
         BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "start_handle_tasks")
-        processMainThreadTasks(mainFinished, start)
-        work.post {
-            processTaskInSubThread(subFinished, mainFinished, start)
+        if (!subThreadTasks.isEmpty()) {
+            work.post {
+                processTaskInSubThread(subFinished, mainFinished, start)
+            }
+        }
+        if (!mainThreadTasks.isEmpty()) {
+            processMainThreadTasks(mainFinished, start)
         }
     }
 
+    @MainThread
     private fun processMainThreadTasks(mainFinished: TasksFinished?, start: Long) {
-        if (mainThreadTasks.size <= 0) {
-            return
-        }
         val resultTasks = mutableListOf<ScheduleTask>()
         val startRun = currentTime()
         BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "start_handle_main_tasks")
         do {
-            var workEnd: Boolean
-            var targetTask: ScheduleTask?
-            synchronized(this) {
-                targetTask = mainThreadTasks.poll()
-                workEnd = mainThreadTasks.isEmpty()
-            }
+            val targetTask: ScheduleTask? = mainThreadTasks.poll()
             targetTask?.let {
                 it.run()
                 resultTasks.add(it)
             }
-            if (workEnd) {
+            if (mainThreadTasks.isEmpty()) {
                 BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "mainTasks_end", currentTime() - startRun)
                 mainFinished?.invoke(resultTasks)
+                isMainTasksFinish = true
+                if (isSubTasksFinish) {
+                    allFinished?.invoke(allTasks)
+                    BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "allTask_main_end", currentTime() - start)
+                }
             }
-            if (taskCount?.decrementAndGet() == 0) {
-                // allTask执行完成
-                BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "allTask_main_end", currentTime() - start)
-                allFinished?.invoke(allTasks)
-            }
-        } while (!workEnd)
+        } while (!mainThreadTasks.isEmpty())
     }
 
+    @WorkerThread
     private fun processTaskInSubThread(subFinished: TasksFinished?, mainFinished: TasksFinished?, start: Long) {
-        if (subThreadTasks.size <= 0) {
-            return
-        }
         val resultTasks = mutableListOf<ScheduleTask>()
+        val failTasks = mutableListOf<ScheduleTask>()
         val startRun = currentTime()
         BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "start_handle_sub_tasks")
         do {
-            var workEnd: Boolean
-            var targetTask: ScheduleTask?
-            synchronized(this) {
-                targetTask = subThreadTasks.poll()
-                workEnd = subThreadTasks.isEmpty()
-            }
+            val targetTask: ScheduleTask? = subThreadTasks.poll()
             runCatching {
                 targetTask?.let {
                     it.run()
                     resultTasks.add(it)
                 }
             }.onFailure {
-                // 子线程任务出现异常时，将任务移到主线程的队列中
-                synchronized(this) {
-                    mainThreadTasks.add(targetTask)
+                targetTask?.let { it1 ->
+                    failTasks.add(it1)
                 }
-                taskCount?.incrementAndGet()
                 handleException(targetTask, it)
             }
-            if (workEnd) {
-                // 子线程任务执行完成
-                BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "subTasks_end", currentTime() - startRun)
-                main.post {
-                    subFinished?.invoke(resultTasks)
-                    // 子线程执行完成后，如果task数量不为0，则兜底触发主线程执行
-                    if ((taskCount?.get() ?: 0) > 0) {
+            if (subThreadTasks.isEmpty()) {
+                if (failTasks.size > 0) {
+                    main.post {
+                        mainThreadTasks.addAll(failTasks)
+                        isMainTasksFinish = false
                         processMainThreadTasks(mainFinished, -1)
                     }
                 }
-            }
-            if (taskCount?.decrementAndGet() == 0) {
-                // allTask执行完成
-                BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "allTask_sub_end", currentTime() - start)
+                BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "subTasks_end", currentTime() - startRun)
                 main.post {
-                    allFinished?.invoke(allTasks)
+                    subFinished?.invoke(resultTasks)
+                    isSubTasksFinish = true
+                    if (isMainTasksFinish) {
+                        BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_RUN_TASK, "allTask_sub_end", currentTime() - start)
+                        allFinished?.invoke(allTasks)
+                    }
                 }
             }
-        } while (!workEnd)
+        } while (!subThreadTasks.isEmpty())
     }
 
     override fun clear() {
@@ -164,17 +148,13 @@ class TaskManager(private val scene: IBlockScene, private val allTaskMustRunOnMa
         subThreadTasks.clear()
     }
 
-    fun handleException(task: ScheduleTask?, t: Throwable) {
+    private fun handleException(task: ScheduleTask?, t: Throwable) {
         if (task is BlockViewBuildTask) {
             if (!BlockInit.logOptEnable() || BlockLogger.debug()) {
                 logger(TAG, "${task.getBlockScene()} build UI Exception in ${Thread.currentThread().name}")
             }
             uploadException(t, true)
-            val params = hashMapOf(
-                "block_key" to (task.uiBlock as BaseBlock<*, *>).getBlockKey(),
-                "msg" to "task_run_exception"
-            )
-            BlockInit.uploadExceptionOnline(params, t)
+            BlockInit.recordException(t)
         }
     }
 }

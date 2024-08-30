@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 
 /**
- * Description:
  *
  * @Author: Created by zhoujunjie on 2023/7/18
  * @mail zhoujunjie.9743@bytedance.com

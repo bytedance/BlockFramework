@@ -78,11 +78,6 @@ fun BaseBlock<*, *>.traverseSubBlock(action: (block: BaseBlock<*, *>) -> Unit) {
     }
 }
 
-
-/**
- * Block中需要在数据Bind之后执行的逻辑
- * 由于异步create View的优化，首次创建卡片时，可能bind的时机会早于View完全创建完成的时机，调用改方法可保证数据Bind后执行
- */
 fun BaseBlock<*, *>.afterBind(action: () -> Unit) {
     blockContext.addAfterBindTask(action)
 }

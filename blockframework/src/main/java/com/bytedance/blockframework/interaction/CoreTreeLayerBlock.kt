@@ -15,8 +15,5 @@
  */
 package com.bytedance.blockframework.interaction
 
-/**
- * block分层节点标记，搭配TreeConstrainBlockMessageCenter使用
- */
 interface CoreTreeLayerBlock {
 }

@@ -52,11 +52,7 @@ object BlockInit {
         BlockLogger.setLogger(config.getBlockLogger())
     }
 
-    fun uploadExceptionOnline(params: Map<String, String>, e: Throwable?) {
-        config.uploadException(params, e)
-    }
-
-    fun optTaskManager(): Boolean {
-        return config.optTaskManagerEnable()
+    fun recordException(e: Throwable?) {
+        config.recordException(e)
     }
 }

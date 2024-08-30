@@ -36,8 +36,6 @@ import com.bytedance.blockframework.interaction.Event
 import com.bytedance.blockframework.interaction.IObserver
 
 /**
- * Description: 管理BlockView的创建，和分发子Block的生命周期
- *   当Block创建子Block时，会给该Block创建一个supervisor
  *
  * @Author: Created by zhoujunjie on 2023/7/17
  * @mail zhoujunjie.9743@bytedance.com
@@ -54,10 +52,18 @@ class BlockSupervisor internal constructor(
     }
 
     private val childList: MutableList<BaseBlock<*, *>> = mutableListOf()
-
     private val serviceMap: MutableMap<Class<*>, BlockImplWrapper> = mutableMapOf()
-
     val eventToObserverMap: MutableMap<Class<Event>, MutableList<IObserver<Event>>> = mutableMapOf()
+
+    @Volatile
+    private var isLifecycleAdded: Boolean = false
+
+    private val lifecycle: Lifecycle
+        get() = (attachBlock as AbstractLifecycleBlock).lifecycle
+
+    private val handler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
 
     fun registerObserver(observer: IObserver<Event>, eventClass: Class<Event>) {
         // update event to observer map
@@ -69,15 +75,6 @@ class BlockSupervisor internal constructor(
         if (!observers.contains(observer)) {
             observers.add(observer)
         }
-//        // update observer to event map
-//        val events = observerToEventMap[observer] ?: run {
-//            mutableListOf<Class<Event>>().apply {
-//                observerToEventMap[observer] = this
-//            }
-//        }
-//        if (!events.contains(eventClass)) {
-//            events.add(eventClass)
-//        }
     }
 
     fun notifyEvent(event: Event): Boolean {
@@ -94,16 +91,6 @@ class BlockSupervisor internal constructor(
             }
         }
         return true
-    }
-
-    @Volatile
-    private var isLifecycleAdded: Boolean = false
-
-    private val lifecycle: Lifecycle
-        get() = (attachBlock as AbstractLifecycleBlock).lifecycle
-
-    private val handler: Handler by lazy {
-        Handler(Looper.getMainLooper())
     }
 
     fun attachLifecycle() {
@@ -130,8 +117,8 @@ class BlockSupervisor internal constructor(
 
     fun installView(target: View) {
         val block = attachBlock as? IUIBlock ?: return
-        val parentView = getAttachView() // 获取当前SuperVisor对应的View
-        if (block.customAssembleView(target, parentView)) { //view构建方式是否由block自行管理
+        val parentView = getAttachView()
+        if (block.customAssembleView(target, parentView)) {
             block.containerView = target
             return
         }
@@ -155,7 +142,6 @@ class BlockSupervisor internal constructor(
         block.containerView = target
     }
 
-    // 替换占位View并添加targetView
     private fun replaceSelfWithView(view: View, placeHolder: View) {
         val parent = placeHolder.parent as? ViewGroup ?: return
         val index = parent.indexOfChild(placeHolder)
@@ -168,7 +154,6 @@ class BlockSupervisor internal constructor(
         }
     }
 
-    // 直接在占位View中添加对应的View
     private fun addViewInPlaceholder(view: View, placeHolder: View, layoutParams: ViewGroup.LayoutParams? = null) {
         val containerView = placeHolder as? ViewGroup ?: return
         if (layoutParams != null) {

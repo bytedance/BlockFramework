@@ -24,33 +24,24 @@ import com.bytedance.blockframework.framework.core.IBlockModel
 import com.bytedance.blockframework.framework.join.IBlockContext
 
 /**
- * @Description:
- *
  * @Author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
 abstract class AsyncUIBlock<DATA, MODEL : IBlockModel<DATA>>(blockContext: IBlockContext) : AsyncBaseBlock<DATA, MODEL>(blockContext), IUIBlock {
 
-    companion object {
-        const val USE_PARENT_LAYOUT = -1
-    }
-
     override val uiConfig: UIBlockConfig = UIBlockConfig()
 
     override lateinit var containerView: View
 
+    abstract fun layoutResource(): Int
+
     override fun onCreateView(parent: View?): View {
-        if (layoutResource() == USE_PARENT_LAYOUT) {
+        if (layoutResource() == IUIBlock.USE_PARENT_LAYOUT) {
             return parent!!
         }
         return uiConfig.viewInflater.getView(layoutResource(), parent!!.context, parent as ViewGroup)
     }
-
-    /**
-     * UIBlock 必须返回layoutResource()，若复用parentView，可返回 USE_PARENT_LAYOUT
-     */
-    abstract fun layoutResource(): Int
 
     override fun onViewCreated(view: View) {}
 

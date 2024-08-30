@@ -24,7 +24,6 @@ import com.bytedance.blockframework.framework.utils.BlockDsl
 import com.bytedance.blockframework.framework.utils.findSupervisor
 
 /**
- * Block组装器
  *
  * @author: Created by zhoujunjie on 2023/8/7
  * @mail zhoujunjie.9743@bytedance.com

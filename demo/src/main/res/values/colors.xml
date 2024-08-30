@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_card_2_dark">#111214</color>
+    <color name="assist_1">#236DDB</color>
+    <color name="assist_1_dark">#499DF2</color>
+    <color name="assist_2">#FF3388</color>
+    <color name="assist_2_dark">#E5398F</color>
+    <color name="assist_3">#FF9900</color>
+    <color name="assist_3_dark">#E59722</color>
+    <color name="assist_4">@color/assist_3</color>
+    <color name="assist_4_dark">@color/assist_3_dark</color>
+    <color name="assist_5">#FFD600</color>
+    <color name="assist_5_dark">#FFD600</color>
+    <color name="assist_6">#29CC54</color>
+    <color name="assist_6_dark">#43BF58</color>
+
+    <color name="content_1">#0C0D0F</color>
+    <color name="content_1_dark">#EBEDF0</color>
+    <color name="content_2">#44474D</color>
+    <color name="content_2_dark">#B4B7BC</color>
+    <color name="content_2_trans24">#3D44474D</color>
+    <color name="content_2_trans30">#4D44474D</color>
+    <color name="content_3">#73767A</color>
+    <color name="content_3_dark">#82858A</color>
+    <color name="content_4">#A3A7AD</color>
+    <color name="content_4_dark">#505357</color>
+    <color name="content_5">#FFFFFF</color>
+    <color name="content_5_dark">#FFFFFF</color>
+</resources>

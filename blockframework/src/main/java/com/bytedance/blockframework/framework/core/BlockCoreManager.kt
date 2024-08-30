@@ -34,20 +34,20 @@ import com.bytedance.blockframework.framework.monitor.currentTime
 import com.bytedance.blockframework.framework.task.BlockViewBuildTask
 import com.bytedance.blockframework.framework.task.ITaskManager
 import com.bytedance.blockframework.framework.task.TaskManager
-import com.bytedance.blockframework.framework.task.TaskManagerOpt
 import com.bytedance.blockframework.framework.utils.getDefaultCenter
 import com.bytedance.blockframework.framework.utils.traverseBlock
 import com.bytedance.blockframework.interaction.Event
 import com.bytedance.blockframework.interaction.IBlockMessageCenter
 
 /**
- * Block管理中枢
  *
  * @author Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
 internal class BlockCoreManager {
+
+    private val tagName by lazy { this::class.java.simpleName + "_" + this.hashCode() }
 
     private lateinit var context: Context
     private lateinit var rootBlock: BaseBlock<*, *>
@@ -56,19 +56,12 @@ internal class BlockCoreManager {
 
     private lateinit var blockContractManager: BlockContractManager
     private var messageCenter: IBlockMessageCenter? = null
-
     private lateinit var taskManager: ITaskManager
     private var uiTasks: MutableList<BlockViewBuildTask> = mutableListOf()
-
     private var supervisorMap: MutableMap<BaseBlock<*, *>, BlockSupervisor> = mutableMapOf()
 
-    private val managerName by lazy { this::class.java.simpleName + "_" + this.hashCode() }
-
-    // 当前Block的View树是否创建完成
     private var isViewCreateCompleted = false
-    // 首次Bind时，由于异步create，bind的时机可能在create还未完成时触发，因此存放pendingTask，当create执行完成后调用
     private var pendingBindTask: (() -> Unit)? = null
-
     private var hasBind = false
     private val afterBindTasks = ArrayList<() -> Unit>()
 
@@ -79,16 +72,12 @@ internal class BlockCoreManager {
     @MainThread
     fun initRootBlock(context: Context, rootBlock: BaseBlock<*, *>, messageCenter: IBlockMessageCenter, parentView: View? = null) {
         val startInit = currentTime()
-        BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_TREE_INIT, "init_start")
+        BlockMonitor.record(scene.getName(), tagName, TYPE_BLOCK_TREE_INIT, "init_start")
         check(rootBlock.parent == null) { "${rootBlock::class.java.simpleName} is rootBlock and can't have a parent" }
         this.context = context
         this.rootBlock = rootBlock
-        rootBlock.immediateBind = true // 根Block默认立即bind
-        taskManager = if(BlockInit.optTaskManager()) {
-            TaskManagerOpt(scene, BlockInit.allTaskMustRunOnMain())
-        } else {
-            TaskManager(scene, BlockInit.allTaskMustRunOnMain())
-        }
+        rootBlock.immediateBind = true
+        taskManager = TaskManager(scene, BlockInit.allTaskMustRunOnMain())
         blockContractManager = BlockContractManager(context, messageCenter ?: getDefaultCenter())
         blockContractManager.registerBlock(rootBlock)
         if (rootBlock is IUIBlock) {
@@ -100,17 +89,15 @@ internal class BlockCoreManager {
             rootView = rootBlock.containerView
         }
         rootBlock.isBlockActivated = true
-        // 根Block初始化，遍历初始化整颗Block树
         rootBlock.assembleSubBlocks(BlockAssemblerImpl(findBlockSupervisor(rootBlock), blockContractManager, uiTasks))
-        // 处理Task
         handleBlockTasks()
-        BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_TREE_INIT, "init_end", currentTime() - startInit)
+        BlockMonitor.record(scene.getName(), tagName, TYPE_BLOCK_TREE_INIT, "init_end", currentTime() - startInit)
     }
 
     private fun handleBlockTasks() {
         taskManager.addTask(uiTasks)
         val startBuild = currentTime()
-        BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_TREE_CREATE, "build_start")
+        BlockMonitor.record(scene.getName(), tagName, TYPE_BLOCK_TREE_CREATE, "build_start")
         taskManager.handleTasks(
             mainFinished = { result ->
                 result.forEach {
@@ -130,8 +117,8 @@ internal class BlockCoreManager {
             },
             allFinished = {
                 isViewCreateCompleted = true
-                BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_TREE_CREATE, "build_end", currentTime() - startBuild)
-                pendingBindTask?.invoke() // 如果bindTask不为空则执行Bind逻辑
+                BlockMonitor.record(scene.getName(), tagName, TYPE_BLOCK_TREE_CREATE, "build_end", currentTime() - startBuild)
+                pendingBindTask?.invoke()
                 pendingBindTask = null
                 rootView?.let {
                     blockContractManager.notifyEvent(AllBlockViewCreatedEvent(it))
@@ -150,18 +137,17 @@ internal class BlockCoreManager {
     @MainThread
     fun <D, M : IBlockModel<D>> bindBlockModel(model: M) {
         val startBind = currentTime()
-        BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_TREE_BIND, "bind_start")
+        BlockMonitor.record(scene.getName(), tagName, TYPE_BLOCK_TREE_BIND, "bind_start")
         hasBind = false
         immediateBindInner(rootBlock as BaseBlock<D, M>, model)
         if (isViewCreateCompleted) {
             pendingBindTask = null
             bindInner(rootBlock as BaseBlock<D, M>, model)
-            BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_TREE_BIND, "bind_end", currentTime() - startBind)
+            BlockMonitor.record(scene.getName(), tagName, TYPE_BLOCK_TREE_BIND, "bind_end", currentTime() - startBind)
         } else {
-            // 开启异步createView后，Bind时机可能比createView的时机晚，因此这里用一个Task存放Bind逻辑，等View创建完成后再执行
             pendingBindTask = {
                 bindInner(rootBlock as BaseBlock<D, M>, model)
-                BlockMonitor.record(scene.getName(), managerName, TYPE_BLOCK_TREE_BIND, "bind_end", currentTime() - startBind)
+                BlockMonitor.record(scene.getName(), tagName, TYPE_BLOCK_TREE_BIND, "bind_end", currentTime() - startBind)
             }
         }
     }
@@ -170,7 +156,6 @@ internal class BlockCoreManager {
         block.traverseBlock {
             if (it.immediateBind) {
                 if (it is IUIBlock) {
-                    // UIBlock需要等到View创建完成后才能Bind
                     if (it.getView() != null) {
                         (it as? BaseBlock<D, M>)?.bindModel(model)
                     } else {

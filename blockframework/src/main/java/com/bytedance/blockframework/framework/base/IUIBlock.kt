@@ -22,24 +22,27 @@ import com.bytedance.blockframework.framework.task.DefaultLayoutInflater
 import kotlinx.android.extensions.LayoutContainer
 
 /**
- * @Description:
  *
  * @Author: Created by zhoujunjie on 2023/8/27
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
-// UI配置
 data class UIBlockConfig(
-    var parentId: Int = -1, // Block对应的View的占位ID
-    var layoutParams: LayoutParams? = null, // Block对应的View的布局参数LayoutParams
-    var createUIOnMainThread: Boolean = false, // 是否在主线程创建UI
-    var replaceParent: Boolean = false, // 是否替换父View
-    var viewInflater: BlockInflater = DefaultLayoutInflater // 自定义ViewInflater
+    var parentId: Int = -1,
+    var layoutParams: LayoutParams? = null,
+    var createUIOnMainThread: Boolean = false,
+    var replaceParent: Boolean = false,
+    var viewInflater: BlockInflater = DefaultLayoutInflater
 )
 
 interface IUIBlock : LayoutContainer {
-    val uiConfig: UIBlockConfig // UIConfig
-    override var containerView: View // Block容器View
+
+    companion object {
+        const val USE_PARENT_LAYOUT = -1
+    }
+
+    val uiConfig: UIBlockConfig
+    override var containerView: View
     fun onCreateView(parent: View?): View
     fun onViewCreated(view: View)
     fun getView(): View?

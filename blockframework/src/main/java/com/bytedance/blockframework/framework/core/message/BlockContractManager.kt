@@ -22,7 +22,6 @@ import com.bytedance.blockframework.interaction.BaseBlockMessageCenter
 import com.bytedance.blockframework.interaction.IBlockMessageCenter
 
 /**
- * @Description: Block通信管理器
  *
  * @Author: Created by zhoujunjie on 2023/8/4
  * @mail zhoujunjie.9743@bytedance.com

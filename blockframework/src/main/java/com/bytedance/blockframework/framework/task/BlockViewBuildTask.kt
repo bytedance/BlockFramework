@@ -26,7 +26,6 @@ import com.bytedance.blockframework.framework.monitor.currentTime
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Description:
  *
  * @Author: Created by zhoujunjie on 2023/7/18
  * @mail zhoujunjie.9743@bytedance.com
@@ -42,6 +41,8 @@ class BlockViewBuildTask(
         var sAtomViewTypeCreator = AtomicInteger(100)
     }
 
+    override val taskPriority: Int = sAtomViewTypeCreator.decrementAndGet()
+
     override val mustMainThread: Boolean = uiBlock.uiConfig.createUIOnMainThread
 
     override fun run() {
@@ -52,11 +53,6 @@ class BlockViewBuildTask(
             BlockMonitor.record(getBlockScene(), (uiBlock as BaseBlock<*, *>).getBlockKey(), TYPE_BLOCK_VIEW_CREATE, "[${currentThread().name}] view_create_end", currentTime() - startCreate)
         }
     }
-
-    /**
-     * uiBlock按照添加的顺序定义优先级，最先添加的Block最先onCreate()
-     */
-    override val taskPriority: Int = sAtomViewTypeCreator.decrementAndGet()
 
     fun getBlockScene(): String {
         return (uiBlock as? BaseBlock<*, *>)?.blockContext?.getScene()?.getName() ?: ""

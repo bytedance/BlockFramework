@@ -22,7 +22,6 @@ import com.bytedance.blockframework.framework.core.IBlockModel
 import com.bytedance.blockframework.framework.join.IBlockContext
 
 /**
- * Description: 包含UI的Block基类
  *
  * @author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com

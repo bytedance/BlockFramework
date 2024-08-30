@@ -24,7 +24,6 @@ import com.bytedance.blockframework.framework.utils.getDefaultCenter
 import com.bytedance.blockframework.interaction.IBlockMessageCenter
 
 /**
- * Block框架接入入口
  *
  * @Author: Created by zhoujunjie on 2023/8/9
  * @mail zhoujunjie.9743@bytedance.com

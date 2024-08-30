@@ -19,7 +19,6 @@ import android.view.View
 import com.bytedance.blockframework.interaction.Event
 
 /**
- * @Description: 整颗Block树的View创建完成时的通知
  *
  * @Author: Created by zhoujunjie on 2023/8/28
  * @mail zhoujunjie.9743@bytedance.com

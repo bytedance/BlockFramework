@@ -21,5 +21,4 @@ package com.bytedance.blockframework.framework.join
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
-interface IAbility {
-}
+interface IBlockAbility

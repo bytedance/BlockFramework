@@ -24,7 +24,8 @@ import com.bytedance.blockframework.framework.utils.findSupervisor
 import com.bytedance.blockframework.framework.utils.uploadException
 
 /**
- * 以CoreTreeLayerBlock为层级节点，限制能力依赖流向的MessageCenter
+ * Use [CoreTreeLayerBlock] as a hierarchical node
+ *  to restrict the [MessageCenter] with capability-dependent flow direction
  */
 abstract class TreeConstrainBlockMessageCenter: BaseBlockMessageCenter() {
 
@@ -41,9 +42,7 @@ abstract class TreeConstrainBlockMessageCenter: BaseBlockMessageCenter() {
 
     override fun <T> queryService(block: AbstractBlock, klass: Class<T>, activeIfNeed: Boolean): T? {
         if (block !is BaseBlock<*, *>) return super.queryService(klass, activeIfNeed)
-
         var res: T? = null
-        //root节点无parent，直接判断
         if (block.parent == null) {
             res = queryService(klass, activeIfNeed)
             if(res != null) return res
@@ -69,7 +68,6 @@ abstract class TreeConstrainBlockMessageCenter: BaseBlockMessageCenter() {
                 uploadException(RuntimeException("TreeConstrainBlockMessageCenter queryService $klass not find"), false)
             }
             if (BlockLogger.debug() && BlockInit.enableDebugDependencyCheck()) {
-                //测试环境抛出不合理的依赖
                 var rootBlock = block.parent?.attachBlock
                 while (rootBlock?.parent != null) {
                     rootBlock = rootBlock.parent?.attachBlock
