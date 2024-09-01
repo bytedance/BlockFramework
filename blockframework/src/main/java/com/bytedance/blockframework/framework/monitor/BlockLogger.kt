@@ -16,7 +16,8 @@
 package com.bytedance.blockframework.framework.monitor
 
 import android.os.SystemClock
-import android.util.Log
+import com.bytedance.blockframework.BuildConfig
+import com.bytedance.blockframework.utils.Logger
 
 /**
  *
@@ -55,13 +56,11 @@ interface BlockLogger {
 class DefaultBlockLogger : BlockLogger {
 
     override fun debug(): Boolean {
-        return false
+        return BuildConfig.DEBUG
     }
 
     override fun log(tag: String, info: String) {
-        if (debug()) {
-            Log.d(tag, info)
-        }
+        Logger.d(tag, info)
     }
 
     override fun report(tag: String, params: Map<String, String>) {
