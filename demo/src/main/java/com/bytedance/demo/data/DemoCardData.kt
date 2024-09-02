@@ -1,6 +1,6 @@
 package com.bytedance.demo.data
 
-import android.graphics.drawable.Drawable
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 
 /**
@@ -18,4 +18,5 @@ data class DemoCardData(
     val praiseCount: String = "",
     val commentCount: String = "",
     val collectCount: String = "",
+    val mainContentBg: Int = 0,
 )

@@ -32,7 +32,7 @@ class DemoActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         val snapHelper = PagerSnapHelper()
         snapHelper.attachToRecyclerView(recyclerView)
-        adapter = DemoAdapter()
+        adapter = DemoAdapter(recyclerView)
         recyclerView.adapter = adapter
     }
 

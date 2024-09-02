@@ -6,5 +6,6 @@
     <string name="praise_text_name">Praise</string>
     <string name="comment_text_name">Comment</string>
     <string name="collect_text_name">Collect</string>
+    <string name="main_content_button">Switch Font Theme</string>
 
 </resources>

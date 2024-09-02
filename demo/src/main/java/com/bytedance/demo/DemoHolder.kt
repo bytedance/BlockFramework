@@ -33,6 +33,7 @@ import com.bytedance.demo.depend.IHolderBlockDepend
 
 class DemoHolder(itemView: View) : RecyclerView.ViewHolder(itemView), IBlockJoin {
 
+    private var ownerRecyclerView: RecyclerView? = null
     private lateinit var rootBlock: DemoCardRootBlock
 
     override val blockContext: IBlockContext by lazy {
@@ -47,9 +48,14 @@ class DemoHolder(itemView: View) : RecyclerView.ViewHolder(itemView), IBlockJoin
         override fun enableAsyncBind(): Boolean {
             return true
         }
+
+        override fun getHolderView(): View {
+            return itemView
+        }
     }
 
-    fun initCardBlock() {
+    fun initCardBlock(recyclerView: RecyclerView) {
+        ownerRecyclerView = recyclerView
         rootBlock = DemoCardRootBlock(itemView, blockContext).apply {
             registerDepend(holderDepend)
         }

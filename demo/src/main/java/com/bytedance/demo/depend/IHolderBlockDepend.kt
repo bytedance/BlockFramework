@@ -1,5 +1,6 @@
 package com.bytedance.demo.depend
 
+import android.view.View
 import com.bytedance.blockframework.framework.join.IBlockDepend
 
 /**
@@ -11,4 +12,5 @@ import com.bytedance.blockframework.framework.join.IBlockDepend
 
 interface IHolderBlockDepend : IBlockDepend {
     fun enableAsyncBind(): Boolean
+    fun getHolderView(): View
 }

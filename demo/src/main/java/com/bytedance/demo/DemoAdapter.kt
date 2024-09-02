@@ -13,7 +13,7 @@ import com.bytedance.demo.data.DemoCardData
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
-class DemoAdapter : RecyclerView.Adapter<DemoHolder>() {
+class DemoAdapter(val recyclerView: RecyclerView) : RecyclerView.Adapter<DemoHolder>() {
 
     private var data = arrayListOf<DemoCardData>()
 
@@ -26,7 +26,7 @@ class DemoAdapter : RecyclerView.Adapter<DemoHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DemoHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.demo_card_holder_layout, parent, false)
         return DemoHolder(itemView).apply {
-            initCardBlock()
+            initCardBlock(recyclerView)
         }
     }
 
