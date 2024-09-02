@@ -12,7 +12,6 @@ BlockFramework is a set of client business architecture frameworks with decoupli
 - Rich communication mechanisms: Support one-to-one, one-to-many, and many-to-one three communication mechanisms.
 - Unified development paradigm: The access and development of BlockFramework provide standard specifications to help multiple developers establish a unified understanding and reduce maintenance costs.
 
-[Download Demo >>>]
 
 ## Applications using BlockFramework
 | <img src="misc/xigua.png" alt="xigua" width="100"/> |

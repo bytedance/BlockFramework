@@ -10,7 +10,6 @@ BlockFramework是一套具备解耦、分层、组装和协同能力的客户端
 - 丰富的通信机制：支持一对一、一对多、多对一三种通信机制；
 - 统一的开发范式：BlockFramework的接入和开发均提供了标准规范，帮助多开发者建立统一认知，降低维护成本。
 
-[下载 Demo >>>]
 
 ## 正在使用 BlockFramework 的应用
 | <img src="misc/xigua.png" alt="xigua" width="100"/> |
