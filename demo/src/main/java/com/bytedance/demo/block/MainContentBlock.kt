@@ -48,13 +48,14 @@ class MainContentBlock(blockContext: IBlockContext) :
                 FontType.Normal -> {
                     notifyEvent(ChangFontThemeEvent(FontType.Bold))
                     currentFontType = FontType.Bold
+                    Toast.makeText(context, "Switch Bold Font Theme!", Toast.LENGTH_SHORT).show()
                 }
                 FontType.Bold -> {
                     notifyEvent(ChangFontThemeEvent(FontType.Normal))
                     currentFontType = FontType.Normal
+                    Toast.makeText(context, "Switch Normal Font Theme!", Toast.LENGTH_SHORT).show()
                 }
             }
-            Toast.makeText(context, "Switch Font Theme!", Toast.LENGTH_SHORT).show()
         }
     }
 

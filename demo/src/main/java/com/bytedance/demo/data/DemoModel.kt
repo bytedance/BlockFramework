@@ -1,7 +1,6 @@
 package com.bytedance.demo.data
 
 import com.bytedance.blockframework.framework.core.IBlockModel
-import com.bytedance.demo.data.DemoCardData
 
 /**
  * description:

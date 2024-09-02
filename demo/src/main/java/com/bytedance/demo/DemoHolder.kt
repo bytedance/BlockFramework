@@ -6,7 +6,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.bytedance.blockframework.framework.join.IBlockContext
-import com.bytedance.blockframework.framework.join.IBlockDepend
 import com.bytedance.blockframework.framework.join.IBlockJoin
 import com.bytedance.blockframework.framework.join.IBlockScene
 import com.bytedance.blockframework.framework.join.bindBlockModel

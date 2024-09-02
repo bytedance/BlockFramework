@@ -1,6 +1,5 @@
 package com.bytedance.demo.data
 
-import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 
 /**
