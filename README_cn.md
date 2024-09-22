@@ -4,12 +4,11 @@
 [![API](https://img.shields.io/badge/api-14%2B-green)](https://developer.android.com/about/dashboards)
 
 ## 项目简介
-In the development process of large-scale APPs, it is not uncommon for multiple business directions or teams to jointly develop the same page. 
-- **Clear business decoupling mechanism**: Developers can easily disassemble complex business logic into multiple independent sub-"Blocks" using BlockFramework, achieving physical isolation in code. Developers of different businesses only need to focus on the development of their own business Blocks, reducing code complexity and thereby improving human efficiency. At the same time, Blocks support cross-scenario reuse. Developers can extract basic capabilities into independent Blocks and then add them to different scenarios, reducing redundant code and lowering maintenance costs.
-- **High-performance UI assembly ability**: BlockFramework builds the interface UI based on a tree structure, which perfectly matches the layout tree structure of the Android system. Developers only need to create simple sub-layout Blocks one by one and then construct the parent-child relationship between Blocks according to business needs, and they can easily build a complex page. At the same time, compared with the commonly used UI assembly methods, BlockFramework integrates performance optimization methods such as asynchronous inflate and asynchronous createView in the UI assembly process to optimize page performance to the extreme.
-- **Rich communication mechanism**: BlockFramework provides multiple communication mechanisms between Blocks (one-to-one, one-to-many, many-to-one), which are used to achieve the linkage and interaction ability between Blocks. The communication mechanism avoids direct interaction between Blocks through interface abstraction and event subscription/distribution, ensuring the independence and reusability of Blocks.
-- **Unified development paradigm**: The access and development process of BlockFramework both provide standard specifications. Developers of different businesses can establish a unified development cognition, reduce cross-line research and development costs, and improve overall research and development efficiency.
-
+在大型 APP 的开发进程中，多个业务方向或团队共同开发同一页面的情形屡见不鲜，若缺乏良好的架构支撑，各业务间的逻辑极易相互耦合，进而致使架构迅速恶化，这无疑会增加业务开发与维护的成本。BlockFramework 作为一套客户端业务解耦框架，具备业务分层、组装以及协同能力，业务方基于此框架能够轻松实现业务解耦，独立开展逻辑迭代，进而提升架构的稳定性，降低维护成本，并提高业务迭代的效率。BlockFramework主要有4大特性：
+- **清晰的业务解耦机制**：开发者使用BlockFramework能够轻松地将复杂的业务逻辑拆解成多个独立的子「Block」，实现代码上的物理隔离，不同业务的开发者只需要聚焦于所属业务Block开发，降低代码复杂度从而提升人效；同时Block支持跨场景复用，开发者可将基础能力抽离成独立的Block后添加到不同的场景中，减少冗余代码，降低维护成本；
+- **高性能的UI组装能力**：BlockFramework基于树状结构搭建界面UI，完美契合Android系统的布局树结构，开发者只需要创建一个个简单的子布局Block，然后按照业务需要构建Block之间的父子关系，便能轻松搭建出一个复杂页面。同时相较于常用的UI组装方式，BlockFramework在UI组装过程中集成了异步inflate、异步createView等性能优化手段，极致优化页面性能；
+- **丰富的通信机制**：BlockFramework提供了Block之间的多种通信机制（一对一、一对多、多对一），用于实现Block之间的联动交互能力，通信机制通过接口抽象、事件订阅/分发的方式，避免了Block与Block之间直接交互，保证了Block的独立性和复用性；
+- **统一的开发范式**：BlockFramework的接入和开发流程均提供了标准规范，不同业务的开发者能够建立统一的开发认知，降低跨线研发成本、提升整体研发效率。
 
 ## 正在使用 BlockFramework 的应用
 | <img src="misc/xigua.png" alt="xigua" width="100"/> | <img src="misc/ott.png" alt="xigua" width="100"/> | <img src="misc/jingxuan.png" alt="xigua" width="100"/> |
