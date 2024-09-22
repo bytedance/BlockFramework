@@ -14,9 +14,9 @@ BlockFramework is a set of client business architecture frameworks with decoupli
 
 
 ## Applications using BlockFramework
-| <img src="misc/xigua.png" alt="xigua" width="100"/> |
-|:---------------------------------------------------:|
-|                     Xigua Video                     | 
+| <img src="misc/xigua.png" alt="xigua" width="100"/> | <img src="misc/ott.png" alt="xigua" width="100"/> | <img src="misc/jingxuan.png" alt="xigua" width="100"/> |
+|:---------------------------------------------------:|:-------------------------------------------------:|:------------------------------------------------------:|
+|                     XiGuaVideo                      |                   XianShiGuang                    |                     DouYinJingXuan                     |
 
 ## Access Quickly
 Add repository source:

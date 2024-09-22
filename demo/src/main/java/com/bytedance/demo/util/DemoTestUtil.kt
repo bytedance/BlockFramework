@@ -22,7 +22,7 @@ object DemoTestUtil {
                     praiseCount = "101",
                     commentCount = "56",
                     collectCount = "292",
-                    mainContentBg = R.color.assist_6_dark
+                    mainContentBg = R.color.content_2
                 )
             )
             add(
