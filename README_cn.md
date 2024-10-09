@@ -21,7 +21,7 @@
 allprojects {
 	repositories {
 		...
-		maven { url 'https://artifact.bytedance.com/repository/releases/' }
+		maven { url 'https://artifact.bytedance.com/repository/Volcengine/' }
 	}
 }
 ```
