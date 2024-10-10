@@ -37,6 +37,7 @@ captures
 
 lint-results.xml
 
-.githookconfig
-config_local.gradle
-__xg_localbuild_script.gradle
+/blockframework/build
+/demo/build
+/blockframework/lint-results.xml
+
