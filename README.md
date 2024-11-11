@@ -30,7 +30,7 @@ allprojects {
 
 Add in dependencies:
 ```gradle
-implementation 'com.github.bytedance:block-framework:$latest_version'
+implementation 'com.github.bytedance:block:$latest_version'
 
 ```
 In a specific business scenario, accessing BlockFramework to build a page only requires a simple 4 steps:

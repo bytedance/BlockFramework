@@ -29,7 +29,7 @@ allprojects {
 在依赖中添加：
 
 ```gradle
-implementation 'com.github.bytedance:block-framework:$latest_version'
+implementation 'com.github.bytedance:block:$latest_version'
 ```
 在具体业务场景接入BlockFramework搭建一个页面，只需要简单4步：
 1. 在主Activity/Fragment/Holder在实现`IBlockJoin`接口，实例化属性`IBlockContext`和`IBlockScene`
