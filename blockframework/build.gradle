@@ -64,10 +64,6 @@ android {
 }
 
 dependencies {
-//    api getLib('FRAMEWORK_UTILITY')
-//    api getLib('LIFECYCLE_EXTENSIONS')
-//    api getLib('COMMON_MONITOR')
-//    api getLib('LIFECYCLE_COMMON')
 
     implementation LIFECYCLE_EXTENSIONS
     implementation LIFECYCLE_COMMON
