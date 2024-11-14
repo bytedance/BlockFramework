@@ -27,7 +27,7 @@ import com.bytedance.blockframework.BuildConfig
 object Logger {
     private const val TAG = "Logger"
 
-    var logLevel = Log.INFO
+    var logLevel = Log.DEBUG
 
     init {
         /**

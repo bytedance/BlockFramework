@@ -16,21 +16,15 @@
 package com.bytedance.blockframework.framework.core
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import com.bytedance.blockframework.contract.AbstractBlock
-import com.bytedance.blockframework.contract.AbstractLifecycleBlock
 import com.bytedance.blockframework.contract.BlockImplWrapper
 import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.base.IUIBlock
 import com.bytedance.blockframework.framework.config.BlockInit
 import com.bytedance.blockframework.framework.monitor.BlockLogger
-import com.bytedance.blockframework.framework.monitor.logger
+import com.bytedance.blockframework.framework.utils.syncInvoke
 import com.bytedance.blockframework.framework.utils.uploadException
 import com.bytedance.blockframework.interaction.Event
 import com.bytedance.blockframework.interaction.IObserver
@@ -43,27 +37,17 @@ import com.bytedance.blockframework.interaction.IObserver
 
 class BlockUnitHandler internal constructor(
     val context: Context,
-    val attachBlock: BaseBlock<*, *>
-) : LifecycleEventObserver {
+    val attachBlock: BaseBlock<*, *>,
+    private val lifecycleHandler: BlockLifeCycleDispatcher
+) {
 
     companion object {
-        const val TAG = "BlockUnitHandler"
-        fun create(context: Context, block: BaseBlock<*, *>) = BlockUnitHandler(context, block)
+        fun create(context: Context, block: BaseBlock<*, *>) = BlockUnitHandler(context, block, BlockLifeCycleDispatcher(block))
     }
 
     private val childList: MutableList<BaseBlock<*, *>> = mutableListOf()
     private val serviceMap: MutableMap<Class<*>, BlockImplWrapper> = mutableMapOf()
     val eventToObserverMap: MutableMap<Class<Event>, MutableList<IObserver<Event>>> = mutableMapOf()
-
-    @Volatile
-    private var isLifecycleAdded: Boolean = false
-
-    private val lifecycle: Lifecycle
-        get() = (attachBlock as AbstractLifecycleBlock).lifecycle
-
-    private val handler: Handler by lazy {
-        Handler(Looper.getMainLooper())
-    }
 
     fun registerObserver(observer: IObserver<Event>, eventClass: Class<Event>) {
         // update event to observer map
@@ -94,19 +78,10 @@ class BlockUnitHandler internal constructor(
     }
 
     fun attachLifecycle() {
-        val runnable = {
-            if (!isLifecycleAdded) {
-                isLifecycleAdded = true
-                lifecycle.addObserver(this)
-            } else {
-                lifecycle.removeObserver(this)
-                lifecycle.addObserver(this)
-            }
-        }
-        if (Thread.currentThread() == Looper.getMainLooper().thread) {
-            runnable.invoke()
-        } else {
-            handler.post { runnable.invoke() }
+        val blockLifecycle = attachBlock.lifecycle
+        syncInvoke {
+            blockLifecycle.removeObserver(lifecycleHandler)
+            blockLifecycle.addObserver(lifecycleHandler)
         }
     }
 
@@ -205,117 +180,5 @@ class BlockUnitHandler internal constructor(
         }
     }
 
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when (event) {
-            Lifecycle.Event.ON_CREATE -> onCreate()
-            Lifecycle.Event.ON_START -> onStart()
-            Lifecycle.Event.ON_RESUME -> onResume()
-            Lifecycle.Event.ON_PAUSE -> onPause()
-            Lifecycle.Event.ON_STOP -> onStop()
-            Lifecycle.Event.ON_DESTROY -> onDestroy()
-            else -> Unit
-        }
-    }
-
-    private fun onCreate() {
-        logger(TAG, "onCreate()")
-        childList.forEach {
-            handleLifecycleState(Lifecycle.State.CREATED, it)
-        }
-    }
-
-    private fun onStart() {
-        logger(TAG, "onStart())")
-        childList.filter { !it.lazyActive }.forEach {
-            handleLifecycleState(Lifecycle.State.STARTED, it)
-        }
-    }
-
-    private fun onResume() {
-        logger(TAG, "onResume())")
-        childList.filter { !it.lazyActive }.forEach {
-            handleLifecycleState(Lifecycle.State.RESUMED, it)
-        }
-    }
-
-    private fun onPause() {
-        logger(TAG, "onPause())")
-        childList.filter { !it.lazyActive }.forEach {
-            handleLifecycleState(Lifecycle.State.STARTED, it)
-        }
-    }
-
-    private fun onStop() {
-        logger(TAG, "onStop())")
-        childList.filter { !it.lazyActive }.forEach {
-            handleLifecycleState(Lifecycle.State.CREATED, it)
-        }
-    }
-
-    private fun onDestroy() {
-        logger(TAG, "onDestroy())")
-        childList.filter { !it.lazyActive }.forEach {
-            handleLifecycleState(Lifecycle.State.DESTROYED, it)
-        }
-        childList.clear()
-        lifecycle.removeObserver(this)
-        isLifecycleAdded = false
-    }
-
-    internal fun handleLifecycleState(state: Lifecycle.State, block: BaseBlock<*, *>) {
-        when (state) {
-            Lifecycle.State.CREATED -> {
-                if ((block as AbstractLifecycleBlock).lifecycle.currentState < Lifecycle.State.CREATED) {
-                    block.performCreate()
-                } else {
-                    if ((block as AbstractLifecycleBlock).lifecycle.currentState > Lifecycle.State.STARTED) {
-                        block.performPause()
-                    }
-                    if ((block as AbstractLifecycleBlock).lifecycle.currentState > Lifecycle.State.CREATED) {
-                        block.performStop()
-                    }
-                }
-            }
-
-            Lifecycle.State.STARTED -> {
-                if ((block as AbstractLifecycleBlock).lifecycle.currentState < Lifecycle.State.STARTED) {
-                    if ((block as AbstractLifecycleBlock).lifecycle.currentState < Lifecycle.State.CREATED) {
-                        block.performCreate()
-                    }
-                    block.performStart()
-                } else if ((block as AbstractLifecycleBlock).lifecycle.currentState > Lifecycle.State.STARTED) {
-                    block.performPause()
-                }
-            }
-
-            Lifecycle.State.RESUMED -> {
-                if ((block as AbstractLifecycleBlock).lifecycle.currentState < Lifecycle.State.RESUMED) {
-                    if ((block as AbstractLifecycleBlock).lifecycle.currentState < Lifecycle.State.CREATED) {
-                        block.performCreate()
-                    }
-                    if ((block as AbstractLifecycleBlock).lifecycle.currentState < Lifecycle.State.STARTED) {
-                        block.performStart()
-                    }
-                    block.performResume()
-                }
-            }
-
-            Lifecycle.State.DESTROYED -> {
-                if ((block as AbstractLifecycleBlock).lifecycle.currentState >= Lifecycle.State.RESUMED) {
-                    block.performPause()
-                }
-                if ((block as AbstractLifecycleBlock).lifecycle.currentState >= Lifecycle.State.STARTED) {
-                    block.performStop()
-                }
-                if ((block as AbstractLifecycleBlock).lifecycle.currentState >= Lifecycle.State.CREATED) {
-                    block.performDestroy()
-                }
-            }
-
-            else -> Unit
-        }
-    }
-
     fun getChildBlocks(): List<BaseBlock<*, *>> = childList
-
 }

@@ -34,6 +34,7 @@ import com.bytedance.blockframework.framework.monitor.currentTime
 import com.bytedance.blockframework.framework.task.BlockViewBuildTask
 import com.bytedance.blockframework.framework.task.ITaskManager
 import com.bytedance.blockframework.framework.task.TaskManager
+import com.bytedance.blockframework.framework.utils.LifecycleUtil
 import com.bytedance.blockframework.framework.utils.getDefaultCenter
 import com.bytedance.blockframework.framework.utils.traverseBlock
 import com.bytedance.blockframework.interaction.Event
@@ -219,7 +220,7 @@ internal class BlockCoreManager {
     }
 
     fun dispatchLifecycleState(state: Lifecycle.State) {
-        findBlockHandler(rootBlock).handleLifecycleState(state, rootBlock)
+        LifecycleUtil.handleLifecycleState(state, rootBlock)
     }
 
 }
