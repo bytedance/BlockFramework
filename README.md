@@ -72,8 +72,8 @@ class DemoCardRootBlock(private val rootView: View, blockContext: IBlockContext)
         return rootView
     }
 
-    override fun assembleSubBlocks(assembler: BlockAssembler) {
-        assembler.assemble {
+    override fun generateSubBlocks(generator: BlockGenerator) {
+        generator.generate {
             addBlock {
                 instance = {
                     MainContentBlock(blockContext)
@@ -264,8 +264,8 @@ BlockFramework has built-in many high performance optimization capabilities, inc
    When adding Block, setting createUIOnMainThread = false means that when the Block creates the View, it will switch to the sub-thread for execution, and after the creation is completed, it will switch back to the main thread to assemble the View. Compared with the overall creation of the View in the main thread, the asynchronous assembly View can shorten the time by about 20%.
 
 ```kotlin
-override fun assembleSubBlocks(assembler: BlockAssembler) {
-    assembler.assemble {
+override fun generateSubBlocks(generator: BlockGenerator) {
+    generator.generate {
         addBlock {
             instance = {
                 BottomInfoBlock(blockContext)
@@ -313,8 +313,8 @@ override fun assembleSubBlocks(assembler: BlockAssembler) {
 </FrameLayout>
 ```
 ```kotlin
-override fun assembleSubBlocks(assembler: BlockAssembler) {
-    assembler.assemble {
+override fun generateSubBlocks(generator: BlockGenerator) {
+    generator.generate {
         addBlock {
             instance = {
                 BottomInfoBlock(blockContext)

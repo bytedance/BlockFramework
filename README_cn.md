@@ -70,8 +70,8 @@ class DemoCardRootBlock(private val rootView: View, blockContext: IBlockContext)
         return rootView
     }
 
-    override fun assembleSubBlocks(assembler: BlockAssembler) {
-        assembler.assemble {
+    override fun generateSubBlocks(generator: BlockGenerator) {
+        generator.generate {
             addBlock {
                 instance = {
                     MainContentBlock(blockContext)
@@ -263,8 +263,8 @@ BlockFramework内置了不少高性能优化能力，包括异步组装View，�
 1. 异步组装View
    在addBlock时，设置`createUIOnMainThread = false`表示该Block创建View的时会切换到子线程执行，创建完成后切换回到主线程组装View，相较于整体在主线程创建View耗时更短，经过对比分析，异步组装View能缩短约20%的耗时。
 ```kotlin
-override fun assembleSubBlocks(assembler: BlockAssembler) {
-    assembler.assemble {
+override fun generateSubBlocks(generator: BlockGenerator) {
+    generator.generate {
         addBlock {
             instance = {
                 BottomInfoBlock(blockContext)
@@ -316,8 +316,8 @@ override fun assembleSubBlocks(assembler: BlockAssembler) {
 </FrameLayout>
 ```
 ```kotlin
-override fun assembleSubBlocks(assembler: BlockAssembler) {
-    assembler.assemble {
+override fun generateSubBlocks(generator: BlockGenerator) {
+    generator.generate {
         addBlock {
             instance = {
                 BottomInfoBlock(blockContext)
