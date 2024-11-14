@@ -58,7 +58,7 @@ internal class BlockCoreManager {
     private var messageCenter: IBlockMessageCenter? = null
     private lateinit var taskManager: ITaskManager
     private var uiTasks: MutableList<BlockViewBuildTask> = mutableListOf()
-    private var supervisorMap: MutableMap<BaseBlock<*, *>, BlockSupervisor> = mutableMapOf()
+    private var blockHandlerMap: MutableMap<BaseBlock<*, *>, BlockUnitHandler> = mutableMapOf()
 
     private var isViewCreateCompleted = false
     private var pendingBindTask: (() -> Unit)? = null
@@ -89,7 +89,7 @@ internal class BlockCoreManager {
             rootView = rootBlock.containerView
         }
         rootBlock.isBlockActivated = true
-        rootBlock.assembleSubBlocks(BlockAssemblerImpl(findBlockSupervisor(rootBlock), blockContractManager, uiTasks))
+        rootBlock.generateSubBlocks(BlockGeneratorImpl(findBlockHandler(rootBlock), blockContractManager, uiTasks))
         handleBlockTasks()
         BlockMonitor.record(scene.getName(), tagName, TYPE_BLOCK_TREE_INIT, "init_end", currentTime() - startInit)
     }
@@ -128,7 +128,7 @@ internal class BlockCoreManager {
     }
 
     private fun buildUIBlock(target: View, uiBlock: IUIBlock) {
-        findBlockSupervisor(uiBlock as BaseBlock<*, *>).apply {
+        findBlockHandler(uiBlock as BaseBlock<*, *>).apply {
             installView(target)
             activeView()
         }
@@ -189,17 +189,17 @@ internal class BlockCoreManager {
         }
     }
 
-    fun findBlockSupervisor(block: BaseBlock<*, *>): BlockSupervisor {
-        var supervisor = supervisorMap[block]
-        if (supervisor == null) {
+    fun findBlockHandler(block: BaseBlock<*, *>): BlockUnitHandler {
+        var handler = blockHandlerMap[block]
+        if (handler == null) {
             if (!this::context.isInitialized) {
                 context = block.context
             }
-            supervisor = BlockSupervisor.create(context, block)
-            supervisorMap[block] = supervisor
-            supervisor.attachLifecycle()
+            handler = BlockUnitHandler.create(context, block)
+            blockHandlerMap[block] = handler
+            handler.attachLifecycle()
         }
-        return supervisor
+        return handler
     }
 
     fun setMessageCenter(center: IBlockMessageCenter) {
@@ -219,7 +219,7 @@ internal class BlockCoreManager {
     }
 
     fun dispatchLifecycleState(state: Lifecycle.State) {
-        findBlockSupervisor(rootBlock).handleLifecycleState(state, rootBlock)
+        findBlockHandler(rootBlock).handleLifecycleState(state, rootBlock)
     }
 
 }

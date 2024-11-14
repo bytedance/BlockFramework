@@ -46,7 +46,7 @@ interface IUIBlock : LayoutContainer {
     fun onCreateView(parent: View?): View
     fun onViewCreated(view: View)
     fun getView(): View?
-    fun customAssembleView(currentView: View, parent: View?): Boolean {
+    fun customGenerateView(currentView: View, parent: View?): Boolean {
         return false
     }
 }

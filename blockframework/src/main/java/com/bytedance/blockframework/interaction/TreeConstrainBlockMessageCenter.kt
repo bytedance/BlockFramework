@@ -20,7 +20,7 @@ import com.bytedance.blockframework.contract.BlockImplWrapper
 import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.config.BlockInit
 import com.bytedance.blockframework.framework.monitor.BlockLogger
-import com.bytedance.blockframework.framework.utils.findSupervisor
+import com.bytedance.blockframework.framework.utils.blockHandler
 import com.bytedance.blockframework.framework.utils.uploadException
 
 /**
@@ -53,13 +53,13 @@ abstract class TreeConstrainBlockMessageCenter: BaseBlockMessageCenter() {
 
 
         var nextTargetCoreTreeBlock: CoreTreeLayerBlock? = null
-        (block.parent ?: block.findSupervisor()).getChildBlocks().forEach {
+        (block.parent ?: block.blockHandler()).getChildBlocks().forEach {
             if(it is CoreTreeLayerBlock) {
                 nextTargetCoreTreeBlock = it
                 return@forEach
             }
         }
-        res = (nextTargetCoreTreeBlock as? BaseBlock<*, *>)?.findSupervisor()?.queryService(klass, activeIfNeed)
+        res = (nextTargetCoreTreeBlock as? BaseBlock<*, *>)?.blockHandler()?.queryService(klass, activeIfNeed)
         if(res != null) return res
 
         val result = queryTargetCoreTreeService((nextTargetCoreTreeBlock as? BaseBlock<*, *>), klass, activeIfNeed)
@@ -88,14 +88,14 @@ abstract class TreeConstrainBlockMessageCenter: BaseBlockMessageCenter() {
         block ?: return null
         var res: T? = null
         var nextTargetCoreTreeBlock: CoreTreeLayerBlock? = null
-        block.findSupervisor()?.getChildBlocks()?.forEach {
+        block.blockHandler()?.getChildBlocks()?.forEach {
             if(it is CoreTreeLayerBlock) {
                 nextTargetCoreTreeBlock = it
                 return@forEach
             }
         }
         nextTargetCoreTreeBlock ?: return null
-        res = (nextTargetCoreTreeBlock as? BaseBlock<*, *>)?.findSupervisor()?.queryService(klass, activeIfNeed)
+        res = (nextTargetCoreTreeBlock as? BaseBlock<*, *>)?.blockHandler()?.queryService(klass, activeIfNeed)
         if(res != null) return res
 
         return queryTargetCoreTreeService(nextTargetCoreTreeBlock as? BaseBlock<*, *>, klass, activeIfNeed)

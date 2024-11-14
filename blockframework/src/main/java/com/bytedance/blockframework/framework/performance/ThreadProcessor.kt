@@ -19,7 +19,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 
-object Executor {
+object ThreadProcessor {
 
     const val BLOCK_WORK_THREAD_LABEL = "Block_WorkThread"
 

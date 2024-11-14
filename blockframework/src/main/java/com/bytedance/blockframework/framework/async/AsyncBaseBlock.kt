@@ -22,7 +22,7 @@ import com.bytedance.blockframework.framework.join.IBlockContext
 import com.bytedance.blockframework.framework.monitor.BlockMonitor
 import com.bytedance.blockframework.framework.monitor.TYPE_BLOCK_BIND
 import com.bytedance.blockframework.framework.monitor.currentTime
-import com.bytedance.blockframework.framework.performance.Executor
+import com.bytedance.blockframework.framework.performance.ThreadProcessor
 
 /**
  *
@@ -43,12 +43,12 @@ abstract class AsyncBaseBlock<DATA, MODEL : IBlockModel<DATA>>(blockContext: IBl
                 BlockInit.recordException(it)
             }
             recordPref(TYPE_BLOCK_BIND, "sync_bind_end", currentTime() - startSync)
-            Executor.work().post {
+            ThreadProcessor.work().post {
                 val startAsync = currentTime()
                 recordPref(TYPE_BLOCK_BIND, "async_bind_start")
                 kotlin.runCatching {
                     asyncBind(model) {
-                        Executor.main().post {
+                        ThreadProcessor.main().post {
                             kotlin.runCatching {
                                 it.invoke()
                             }.onFailure {

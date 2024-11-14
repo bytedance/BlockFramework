@@ -17,7 +17,6 @@ package com.bytedance.blockframework.framework.task
 
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.config.BlockInit
 import com.bytedance.blockframework.framework.join.IBlockScene
 import com.bytedance.blockframework.framework.monitor.BlockLogger
@@ -25,8 +24,8 @@ import com.bytedance.blockframework.framework.monitor.BlockMonitor
 import com.bytedance.blockframework.framework.monitor.TYPE_BLOCK_RUN_TASK
 import com.bytedance.blockframework.framework.monitor.currentTime
 import com.bytedance.blockframework.framework.monitor.logger
-import com.bytedance.blockframework.framework.performance.Executor
-import com.bytedance.blockframework.framework.performance.ExecutorHandler
+import com.bytedance.blockframework.framework.performance.ThreadProcessor
+import com.bytedance.blockframework.framework.performance.HandlerProcessor
 import com.bytedance.blockframework.framework.utils.uploadException
 import java.util.PriorityQueue
 
@@ -36,8 +35,8 @@ class TaskManager(private val scene: IBlockScene, private val allTaskMustRunOnMa
 
     private val managerName by lazy { this::class.java.simpleName + "_" + this.hashCode() }
 
-    private var main: ExecutorHandler = ExecutorHandler(Executor.main(), false)
-    private var work: ExecutorHandler = ExecutorHandler(Executor.work(), false)
+    private var main: HandlerProcessor = HandlerProcessor(ThreadProcessor.main(), false)
+    private var work: HandlerProcessor = HandlerProcessor(ThreadProcessor.work(), false)
 
     private val mainThreadTasks = PriorityQueue(20,
         Comparator<ScheduleTask> { o1, o2 -> o2.taskPriority.compareTo(o1.taskPriority) })

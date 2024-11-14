@@ -18,7 +18,7 @@ package com.bytedance.demo.block
 import android.view.View
 import com.bytedance.blockframework.framework.base.IUIBlock
 import com.bytedance.blockframework.framework.base.UIBlock
-import com.bytedance.blockframework.framework.core.BlockAssembler
+import com.bytedance.blockframework.framework.core.BlockGenerator
 import com.bytedance.blockframework.framework.join.IBlockContext
 import com.bytedance.demo.R
 import com.bytedance.demo.data.DemoCardData
@@ -42,8 +42,8 @@ class DemoCardRootBlock(private val rootView: View, blockContext: IBlockContext)
         return rootView
     }
 
-    override fun assembleSubBlocks(assembler: BlockAssembler) {
-        assembler.assemble {
+    override fun generateSubBlocks(generator: BlockGenerator) {
+        generator.generate {
             addBlock {
                 instance = {
                     MainContentBlock(blockContext)

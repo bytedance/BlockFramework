@@ -21,7 +21,7 @@ import androidx.lifecycle.Lifecycle
 import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.config.BlockInit
 import com.bytedance.blockframework.framework.core.BlockCoreManager
-import com.bytedance.blockframework.framework.core.BlockSupervisor
+import com.bytedance.blockframework.framework.core.BlockUnitHandler
 import com.bytedance.blockframework.framework.core.IBlockModel
 import com.bytedance.blockframework.framework.monitor.BlockLogger
 import com.bytedance.blockframework.framework.task.BlockInflater
@@ -41,7 +41,7 @@ interface IBlockContext {
     fun getScene(): IBlockScene
     fun setMessageCenter(center: IBlockMessageCenter)
     fun getMessageCenter(): IBlockMessageCenter
-    fun findBlockSupervisor(block: BaseBlock<*,*>): BlockSupervisor
+    fun findBlockHandler(block: BaseBlock<*,*>): BlockUnitHandler
     fun setLayoutInflater(inflater: BlockInflater)
     fun getLayoutInflater(): BlockInflater
     fun <T : IBlockDepend> registerDepend(clazz: Class<T>, depend: T)
@@ -112,8 +112,8 @@ class BlockContextImpl(private val blockScene: IBlockScene) : IBlockContext {
         return blockCore.getMessageCenter()
     }
 
-    override fun findBlockSupervisor(block: BaseBlock<*,*>): BlockSupervisor {
-        return blockCore.findBlockSupervisor(block)
+    override fun findBlockHandler(block: BaseBlock<*,*>): BlockUnitHandler {
+        return blockCore.findBlockHandler(block)
     }
 
     override fun setLayoutInflater(inflater: BlockInflater) {

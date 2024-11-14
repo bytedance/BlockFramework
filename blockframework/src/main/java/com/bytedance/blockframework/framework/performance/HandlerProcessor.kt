@@ -23,7 +23,7 @@ import android.os.Handler
  * @Author: Created by zhoujunjie on 2022/12/20
  * @mail zhoujunjie.9743@bytedance.com
  **/
-class ExecutorHandler(private val handler: Handler, private val sync: Boolean) {
+class HandlerProcessor(private val handler: Handler, private val sync: Boolean) {
 
     fun post(runnable: () -> Unit) {
         if (sync) {

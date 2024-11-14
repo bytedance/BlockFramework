@@ -18,7 +18,6 @@ package com.bytedance.blockframework.framework.core
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
@@ -31,6 +30,7 @@ import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.base.IUIBlock
 import com.bytedance.blockframework.framework.config.BlockInit
 import com.bytedance.blockframework.framework.monitor.BlockLogger
+import com.bytedance.blockframework.framework.monitor.logger
 import com.bytedance.blockframework.framework.utils.uploadException
 import com.bytedance.blockframework.interaction.Event
 import com.bytedance.blockframework.interaction.IObserver
@@ -41,14 +41,14 @@ import com.bytedance.blockframework.interaction.IObserver
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
-class BlockSupervisor internal constructor(
+class BlockUnitHandler internal constructor(
     val context: Context,
     val attachBlock: BaseBlock<*, *>
 ) : LifecycleEventObserver {
 
     companion object {
-        const val TAG = "BlockSupervisor"
-        fun create(context: Context, block: BaseBlock<*, *>) = BlockSupervisor(context, block)
+        const val TAG = "BlockUnitHandler"
+        fun create(context: Context, block: BaseBlock<*, *>) = BlockUnitHandler(context, block)
     }
 
     private val childList: MutableList<BaseBlock<*, *>> = mutableListOf()
@@ -118,7 +118,7 @@ class BlockSupervisor internal constructor(
     fun installView(target: View) {
         val block = attachBlock as? IUIBlock ?: return
         val parentView = getAttachView()
-        if (block.customAssembleView(target, parentView)) {
+        if (block.customGenerateView(target, parentView)) {
             block.containerView = target
             return
         }
@@ -212,48 +212,48 @@ class BlockSupervisor internal constructor(
             Lifecycle.Event.ON_RESUME -> onResume()
             Lifecycle.Event.ON_PAUSE -> onPause()
             Lifecycle.Event.ON_STOP -> onStop()
-            Lifecycle.Event.ON_DESTROY -> onDestory()
+            Lifecycle.Event.ON_DESTROY -> onDestroy()
             else -> Unit
         }
     }
 
     private fun onCreate() {
-        Log.i(TAG, "onCreate: ")
+        logger(TAG, "onCreate()")
         childList.forEach {
             handleLifecycleState(Lifecycle.State.CREATED, it)
         }
     }
 
     private fun onStart() {
-        Log.i(TAG, "onStart: ")
+        logger(TAG, "onStart())")
         childList.filter { !it.lazyActive }.forEach {
             handleLifecycleState(Lifecycle.State.STARTED, it)
         }
     }
 
     private fun onResume() {
-        Log.i(TAG, "onResume: ")
+        logger(TAG, "onResume())")
         childList.filter { !it.lazyActive }.forEach {
             handleLifecycleState(Lifecycle.State.RESUMED, it)
         }
     }
 
     private fun onPause() {
-        Log.i(TAG, "onPause: ")
+        logger(TAG, "onPause())")
         childList.filter { !it.lazyActive }.forEach {
             handleLifecycleState(Lifecycle.State.STARTED, it)
         }
     }
 
     private fun onStop() {
-        Log.i(TAG, "onStop: ")
+        logger(TAG, "onStop())")
         childList.filter { !it.lazyActive }.forEach {
             handleLifecycleState(Lifecycle.State.CREATED, it)
         }
     }
 
-    private fun onDestory() {
-        Log.i(TAG, "onDestroy")
+    private fun onDestroy() {
+        logger(TAG, "onDestroy())")
         childList.filter { !it.lazyActive }.forEach {
             handleLifecycleState(Lifecycle.State.DESTROYED, it)
         }

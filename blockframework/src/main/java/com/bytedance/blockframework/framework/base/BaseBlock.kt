@@ -16,12 +16,12 @@
 package com.bytedance.blockframework.framework.base
 
 import com.bytedance.blockframework.contract.AbstractLifecycleBlock
-import com.bytedance.blockframework.framework.core.BlockAssembler
-import com.bytedance.blockframework.framework.core.BlockSupervisor
+import com.bytedance.blockframework.framework.core.BlockGenerator
+import com.bytedance.blockframework.framework.core.BlockUnitHandler
 import com.bytedance.blockframework.framework.core.IBlockModel
 import com.bytedance.blockframework.framework.core.message.TreeBlockMessageCenter
 import com.bytedance.blockframework.framework.join.IBlockContext
-import com.bytedance.blockframework.framework.utils.findSupervisor
+import com.bytedance.blockframework.framework.utils.blockHandler
 
 /**
  *
@@ -33,7 +33,7 @@ open class BaseBlock<DATA, MODEL : IBlockModel<DATA>>(var blockContext: IBlockCo
 
     private val blockName by lazy { this::class.java.simpleName + "_" + this.hashCode() }
 
-    internal var parent: BlockSupervisor? = null
+    internal var parent: BlockUnitHandler? = null
     internal var immediateBind = false
 
     open var lazyActive = false
@@ -68,15 +68,15 @@ open class BaseBlock<DATA, MODEL : IBlockModel<DATA>>(var blockContext: IBlockCo
 
     open fun bindModel(model: MODEL?) {}
 
-    open fun assembleSubBlocks(assembler: BlockAssembler) {}
+    open fun generateSubBlocks(generator: BlockGenerator) {}
 
     override fun <T> getBlockService(klass: Class<T>, activeIfNeed: Boolean): T? {
         if (blockBlockMessageCenter is TreeBlockMessageCenter) {
-            var supervisor = findSupervisor()
-            var impl = supervisor.queryService(klass, activeIfNeed)
+            var handler = blockHandler()
+            var impl = handler.queryService(klass, activeIfNeed)
             while (impl == null) {
-                supervisor = supervisor.attachBlock.parent ?: break
-                impl = supervisor.queryService(klass, activeIfNeed)
+                handler = handler.attachBlock.parent ?: break
+                impl = handler.queryService(klass, activeIfNeed)
             }
             return impl
         }

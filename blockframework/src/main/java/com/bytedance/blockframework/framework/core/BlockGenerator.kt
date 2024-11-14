@@ -21,7 +21,7 @@ import com.bytedance.blockframework.framework.base.IUIBlock
 import com.bytedance.blockframework.framework.core.message.BlockContractManager
 import com.bytedance.blockframework.framework.task.BlockViewBuildTask
 import com.bytedance.blockframework.framework.utils.BlockDsl
-import com.bytedance.blockframework.framework.utils.findSupervisor
+import com.bytedance.blockframework.framework.utils.blockHandler
 
 /**
  *
@@ -29,22 +29,22 @@ import com.bytedance.blockframework.framework.utils.findSupervisor
  * @mail zhoujunjie.9743@bytedance.com
  **/
 
-interface BlockAssembler {
-    fun assemble(action: SubBlocksAdder.() -> Unit)
+interface BlockGenerator {
+    fun generate(action: SubBlockCreator.() -> Unit)
 }
 
-interface SubBlocksAdder {
+interface SubBlockCreator {
     @BlockDsl
     fun addBlock(builder: BlockBuilder.() -> Unit)
 }
 
-internal class BlockAssemblerImpl(
-    private val supervisor: BlockSupervisor?,
+internal class BlockGeneratorImpl(
+    private val supervisor: BlockUnitHandler?,
     private val contractManager: BlockContractManager,
     private val uiTasks: MutableList<BlockViewBuildTask>
-) : BlockAssembler {
-    override fun assemble(action: SubBlocksAdder.() -> Unit) {
-        val adder = object : SubBlocksAdder {
+) : BlockGenerator {
+    override fun generate(action: SubBlockCreator.() -> Unit) {
+        val adder = object : SubBlockCreator {
             override fun addBlock(builder: BlockBuilder.() -> Unit) {
                 supervisor?.apply {
                     val config = BlockBuilder().apply(builder)
@@ -77,7 +77,7 @@ internal class BlockAssemblerImpl(
                                 val task = BlockViewBuildTask(block, parentView as? ViewGroup)
                                 task.run()
                                 val target = task.result.value
-                                block.findSupervisor().apply {
+                                block.blockHandler().apply {
                                     installView(target)
                                     activeView()
                                 }
@@ -88,7 +88,7 @@ internal class BlockAssemblerImpl(
                     }
                     loadBlock(block)
                     contractManager.registerBlock(block)
-                    block.assembleSubBlocks(BlockAssemblerImpl(block.findSupervisor(), contractManager, uiTasks))
+                    block.generateSubBlocks(BlockGeneratorImpl(block.blockHandler(), contractManager, uiTasks))
                 }
             }
         }

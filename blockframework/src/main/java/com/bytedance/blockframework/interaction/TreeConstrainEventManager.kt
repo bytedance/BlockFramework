@@ -18,7 +18,7 @@ package com.bytedance.blockframework.interaction
 import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.config.BlockInit
 import com.bytedance.blockframework.framework.monitor.BlockLogger
-import com.bytedance.blockframework.framework.utils.findSupervisor
+import com.bytedance.blockframework.framework.utils.blockHandler
 
 /**
  * EventManager that restricts event flow
@@ -31,7 +31,7 @@ open class TreeConstrainEventManager:  EventManager() {
             return
         }
         if (observer.parent == null) {
-            observer.findSupervisor().registerObserver(observer, eventClass)
+            observer.blockHandler().registerObserver(observer, eventClass)
             return
         } else {
             observer.parent?.registerObserver(observer, eventClass)
@@ -60,7 +60,7 @@ open class TreeConstrainEventManager:  EventManager() {
     private fun findLowerObserver(block: BaseBlock<*, *>?, event: Event): Boolean {
         block ?: return false
         var nextTargetCoreTreeBlock: CoreTreeLayerBlock? = null
-        val supervisor = if (block is CoreTreeLayerBlock) block.findSupervisor() else block.parent
+        val supervisor = if (block is CoreTreeLayerBlock) block.blockHandler() else block.parent
         supervisor?.getChildBlocks()?.forEach {
             if(it is CoreTreeLayerBlock) {
                 nextTargetCoreTreeBlock = it
@@ -68,7 +68,7 @@ open class TreeConstrainEventManager:  EventManager() {
             }
         }
         nextTargetCoreTreeBlock ?: return false
-        val observers = (nextTargetCoreTreeBlock as? BaseBlock<*, *>)?.findSupervisor()?.eventToObserverMap?.get(event.javaClass)
+        val observers = (nextTargetCoreTreeBlock as? BaseBlock<*, *>)?.blockHandler()?.eventToObserverMap?.get(event.javaClass)
         if (observers?.isNotEmpty() == true)  return true
 
         return findLowerObserver(nextTargetCoreTreeBlock as? BaseBlock<*, *>, event)

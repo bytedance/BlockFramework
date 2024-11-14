@@ -18,11 +18,11 @@ package com.bytedance.blockframework.framework.utils
 import android.os.Looper
 import com.bytedance.blockframework.framework.base.BaseBlock
 import com.bytedance.blockframework.framework.config.BlockInit
-import com.bytedance.blockframework.framework.core.BlockSupervisor
+import com.bytedance.blockframework.framework.core.BlockUnitHandler
 import com.bytedance.blockframework.framework.core.message.TreeBlockMessageCenter
 import com.bytedance.blockframework.framework.join.IBlockDepend
 import com.bytedance.blockframework.framework.monitor.BlockLogger
-import com.bytedance.blockframework.framework.performance.Executor
+import com.bytedance.blockframework.framework.performance.ThreadProcessor
 import com.bytedance.blockframework.interaction.BaseBlockMessageCenter
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -35,8 +35,8 @@ import kotlin.reflect.KProperty
 
 fun getDefaultCenter() = if (BlockInit.useTreeMessageCenterEnable()) TreeBlockMessageCenter() else BaseBlockMessageCenter()
 
-fun BaseBlock<*, *>.findSupervisor(): BlockSupervisor {
-    return blockContext.findBlockSupervisor(this)
+fun BaseBlock<*, *>.blockHandler(): BlockUnitHandler {
+    return blockContext.findBlockHandler(this)
 }
 
 inline fun <reified T> BaseBlock<*, *>.blockService(): ReadOnlyProperty<BaseBlock<*, *>, T?> {
@@ -67,13 +67,13 @@ inline fun <reified T : IBlockDepend> BaseBlock<*, *>.findDepend(): ReadOnlyProp
 
 fun BaseBlock<*, *>.traverseBlock(action: (block: BaseBlock<*, *>) -> Unit) {
     action(this)
-    this.findSupervisor().getChildBlocks().forEach {
+    this.blockHandler().getChildBlocks().forEach {
         it.traverseBlock(action)
     }
 }
 
 fun BaseBlock<*, *>.traverseSubBlock(action: (block: BaseBlock<*, *>) -> Unit) {
-    this.findSupervisor().getChildBlocks().forEach {
+    this.blockHandler().getChildBlocks().forEach {
         it.traverseBlock(action)
     }
 }
@@ -86,7 +86,7 @@ fun syncInvoke(action: () -> Unit) {
     if (Looper.getMainLooper() == Looper.myLooper()) {
         action()
     } else {
-        Executor.main().post(action)
+        ThreadProcessor.main().post(action)
     }
 }
 
